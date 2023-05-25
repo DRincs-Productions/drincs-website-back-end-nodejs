@@ -6,7 +6,6 @@ export function generatedResponseByServiceResponse<T>(serviceResponse: ServiceRe
     let res = new HttpResponse<T>(statusCode)
 
     res.content = serviceResponse.content;
-    res.messagesAlert = serviceResponse.messages;
     res.messagesToShow = serviceResponse.messagesToShow;
     if (messages) {
         res.messages = messages
@@ -20,16 +19,15 @@ export function generatedResponseByServiceResponse<T>(serviceResponse: ServiceRe
 }
 
 export class HttpResponse<T> {
-    constructor(statusCode: StatusCodes, messages?: string, messagesAlert: string = "", content?: T) {
+    constructor(statusCode: StatusCodes, messages?: string, messagesToShow?: string, content?: T) {
         this.statusCodes = statusCode
         this.messages = messages ? messages : "Status " + this.statusCodes;
-        this.messagesAlert = messagesAlert;
         this.content = content;
+        this.messagesToShow = messagesToShow;
     }
 
     content?: T;
     messages: string | string[] = "";
-    messagesAlert: string = "";
     messagesToShow?: string;
     statusCodes: StatusCodes = StatusCodes.OK;
 }

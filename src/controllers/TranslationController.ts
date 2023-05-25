@@ -13,7 +13,7 @@ export class TranslationController extends ControllerInterface {
             try {
                 res.send(new HttpResponse<TranslationResult>(StatusCodes.OK))
             } catch (e) {
-                //res.status(500).send(this.catch<TranslationResult>(e))
+                this.sendError(res, e)
             }
         })
     }

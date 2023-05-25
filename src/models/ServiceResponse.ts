@@ -1,5 +1,5 @@
 export class ServiceResponse<T> {
-    constructor(messages: string = "", messagesToShow?: string, content?: T, isSuccesful: boolean = true) {
+    constructor(messages: string = "", isSuccesful: boolean = true, messagesToShow?: string, content?: T) {
         this.messages = messages
         this.messagesToShow = messagesToShow
         this.isSuccesful = isSuccesful

@@ -1,4 +1,6 @@
-import { Express } from 'express';
+import { Express, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { HttpResponse } from '../models/HttpResponse';
 
 abstract class ControllerInterface {
     constructor(app: Express, route: string) {
@@ -6,8 +8,18 @@ abstract class ControllerInterface {
         this.route = route
         console.info("Route added: " + route)
     }
-    app: Express
-    route: string
+    private app: Express
+    private route: string
+
+    protected sendError<T>(res: Response<HttpResponse<T>>, e: any | Error, statusCode: StatusCodes = StatusCodes.BAD_REQUEST): void {
+        let messages: string = ""
+        let messagesToShow: string | undefined = undefined
+        if (e instanceof Error) {
+            messages = e.message.toLocaleLowerCase()
+        }
+        let value = new HttpResponse<T>(statusCode, messages, messagesToShow)
+        res.status(statusCode).send(value)
+    }
 }
 
 export default ControllerInterface;
