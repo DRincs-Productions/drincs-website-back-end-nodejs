@@ -1,21 +1,7 @@
 import { StatusCodes } from "http-status-codes";
-import { ServiceResponse } from "./ServiceResponse";
 
-export function generatedResponseByServiceResponse<T>(serviceResponse: ServiceResponse<T>, statusCode?: StatusCodes, messages?: string) {
-    statusCode = statusCode ? statusCode : serviceResponse.isSuccesful ? StatusCodes.OK : StatusCodes.BAD_REQUEST
-    let res = new HttpResponse<T>(statusCode)
-
-    res.content = serviceResponse.content;
-    res.messagesToShow = serviceResponse.messagesToShow;
-    if (messages) {
-        res.messages = messages
-    }
-    else if (serviceResponse.isSuccesful) {
-        res.messages = "Ok";
-    }
-    else {
-        res.messages = "Error";
-    }
+export function generatedSuccesResult<T>(content?: T, messages?: string, messagesToShow?: string, statusCode: StatusCodes = StatusCodes.OK) {
+    return new HttpResponse(statusCode, messages, messagesToShow, content)
 }
 
 export class HttpResponse<T> {

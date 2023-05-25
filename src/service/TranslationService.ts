@@ -1,66 +1,54 @@
-import { ServiceResponse } from "../models/ServiceResponse";
 import { TranslationResult, TranslationResultItem } from "../models/translation/TranslationResult";
+import { GetLanguagesAsync as getLanguages, getProject } from "./CrowdinService";
 import { getTranslationRelease } from "./GitHubService";
 
-export function getTranslations(repositoryName: string, crowdinProjectId: string): ServiceResponse<TranslationResult> {
-    console.info("Start Translation GetTranslationsAsync");
-    var releases = getTranslationRelease(repositoryName);
-    var projectInfo = (await getProjectAsync(crowdinProjectId));
-    var languages = (await getLanguagesAsync(crowdinProjectId));
-
-    if (!projectInfo.IsSuccesful || releases.Content == null) {
-        throw Error(projectInfo.Messages)
-    }
-
-    if (!languages.IsSuccesful || languages.Content == null) {
-        throw Error(languages.Messages)
-    }
+export async function getTranslations(repositoryName: string, crowdinProjectId: string): Promise<TranslationResult> {
+    console.info("Start Translation GetTranslationsAsync")
+    var releases = await getTranslationRelease(repositoryName)
+    var projectInfo = await getProject(crowdinProjectId)
+    var languages = await getLanguages(crowdinProjectId)
 
     var resultArray: TranslationResultItem[] = []
     var index = 0;
 
-    foreach(var item in languages.Content)
-    {
+    languages.forEach((item) => {
         var translationResultItem = new TranslationResultItem();
-        translationResultItem.Id = index;
-        translationResultItem.Translated = item?.Data?.Phrases != null ? (item.Data.Phrases.Translated * 100) / item.Data.Phrases.Total : 0;
-        translationResultItem.Approved = item?.Data?.Phrases != null ? (item.Data.Phrases.Approved * 100) / item.Data.Phrases.Total : 0;
-        translationResultItem.TargetLanguages = projectInfo?.Content?.Data?.TargetLanguages?.ToList().Find(lang => {
+        translationResultItem.id = index;
+        translationResultItem.translated = item?.data?.phrases != null ? (item.data.phrases.translated * 100) / item.data.phrases.total : 0;
+        translationResultItem.approved = item?.data?.phrases != null ? (item.data.phrases.approved * 100) / item.data.phrases.total : 0;
+        translationResultItem.targetLanguages = projectInfo?.data?.targetLanguages?.find(lang => {
             // https://www.iban.com/country-codes
-            if (lang.TwoLettersCode.ToLower() == "ja") {
-                lang.TwoLettersCode = "jp";
+            if (lang.twoLettersCode?.toLowerCase() == "ja") {
+                lang.twoLettersCode = "jp";
             }
-            if (lang.TwoLettersCode.ToLower() == "zh") {
-                lang.TwoLettersCode = "cn";
-                lang.Name = "Chinese";
+            if (lang.twoLettersCode?.toLowerCase() == "zh") {
+                lang.twoLettersCode = "cn";
+                lang.name = "Chinese";
             }
-            if (lang.TwoLettersCode.ToLower() == "el") {
-                lang.TwoLettersCode = "gr";
+            if (lang.twoLettersCode?.toLowerCase() == "el") {
+                lang.twoLettersCode = "gr";
             }
-            return lang.Id?.ToLower() == item?.Data?.LanguageId?.ToLower();
+            return lang.id?.toLowerCase() == item?.data?.languageId?.toLowerCase();
         });
-        translationResultItem.Release = null;
+        translationResultItem.release = undefined;
 
-        foreach(var release in releases.Content)
-        {
-            if (translationResultItem == null) continue;
-
-            if (translationResultItem.TargetLanguages?.Name?.ToLower() == release.Language?.ToLower()) {
-                if (translationResultItem.Release == null || translationResultItem?.Release?.Date < release.Date) {
-                    translationResultItem.Release = release;
+        releases.forEach((release) => {
+            if (translationResultItem && translationResultItem.targetLanguages?.name?.toLowerCase() == release.language?.toLowerCase()) {
+                if (!translationResultItem.release || new Date(translationResultItem?.release?.date) < new Date(release.date)) {
+                    translationResultItem.release = release;
                 }
             }
-        }
+        })
 
-        resultArray.Add(translationResultItem);
+        resultArray.push(translationResultItem);
         index++;
-    }
+    })
 
     var result = new TranslationResult();
-    result.List = resultArray;
-    result.Name = projectInfo?.Content?.Data?.Name;
-    result.Logo = projectInfo?.Content?.Data?.Logo;
-    result.Description = projectInfo?.Content?.Data?.Description;
+    result.list = resultArray;
+    result.name = projectInfo?.data?.name;
+    result.logo = projectInfo?.data?.logo;
+    result.description = projectInfo?.data?.description;
 
-    return new ServiceResponse<TranslationResult>(result, isSuccesful: true);
+    return result;
 }
