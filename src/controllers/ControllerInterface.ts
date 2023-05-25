@@ -1,6 +1,7 @@
 import { Express, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { HttpResponse } from '../models/HttpResponse';
+import { MyError } from '../models/MyError';
 
 abstract class ControllerInterface {
     constructor(app: Express, route: string) {
@@ -11,10 +12,14 @@ abstract class ControllerInterface {
     private app: Express
     private route: string
 
-    protected sendError<T>(res: Response<HttpResponse<T>>, e: any | Error, statusCode: StatusCodes = StatusCodes.BAD_REQUEST): void {
+    protected sendError<T>(res: Response<HttpResponse<T>>, e: any | Error, statusCode: StatusCodes = StatusCodes.INTERNAL_SERVER_ERROR): void {
         let messages: string = ""
         let messagesToShow: string | undefined = undefined
-        if (e instanceof Error) {
+        if (e instanceof MyError) {
+            messages = e.message.toLocaleLowerCase()
+            messagesToShow = e.messageToShow.toLocaleLowerCase()
+        }
+        else if (e instanceof Error) {
             messages = e.message.toLocaleLowerCase()
         }
         let value = new HttpResponse<T>(statusCode, messages, messagesToShow)

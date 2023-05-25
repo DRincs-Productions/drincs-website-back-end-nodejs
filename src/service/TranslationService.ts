@@ -8,10 +8,6 @@ export function getTranslations(repositoryName: string, crowdinProjectId: string
     var projectInfo = (await getProjectAsync(crowdinProjectId));
     var languages = (await getLanguagesAsync(crowdinProjectId));
 
-    if (!releases.IsSuccesful || releases.Content == null) {
-        throw Error(releases.Messages)
-    }
-
     if (!projectInfo.IsSuccesful || releases.Content == null) {
         throw Error(projectInfo.Messages)
     }

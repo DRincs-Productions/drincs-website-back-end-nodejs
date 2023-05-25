@@ -1,9 +1,14 @@
 import { ServiceResponse } from "../models/ServiceResponse";
+import { GitHubCreateIssueBody } from "../models/git/GitHubCreateIssueBody";
+import { GitHubRelease } from "../models/git/GitHubRelease";
 import { GitHubTranslationRelease } from "../models/git/GitHubTranslationRelease";
 import { GitRelease } from "../models/git/GitRelease";
 import { isNullOrEmpty } from "../utility/UtilityFunctionts";
+import { getRequest } from "./BaseRestService";
 
-function getReleases(repositoryName: string): ServiceResponse<GitRelease[]> {
+const token = ""
+
+async function getReleases(repositoryName: string): Promise<GitRelease[]> {
     let endpoint: string = "repos/" + repositoryName + "/releases";
 
     if (isNullOrEmpty(repositoryName)) {
@@ -13,37 +18,20 @@ function getReleases(repositoryName: string): ServiceResponse<GitRelease[]> {
     if (isNullOrEmpty(token)) {
         throw Error("GitService GetReleases token Is Null Or Empty")
     }
-
-    var request = new RestRequest(endpoint, Method.Get);
-    request.AddHeader("Authorization", "token " + token);
-    try {
-        var response = await client.ExecuteAsync<IEnumerable<GitHubRelease>>(request);
-        if (!response.IsSuccessful) {
-            throw Error("GitService GetReleases Is Not Successful")
-        }
-
-        var data = response.Data;
-
-        if (data == null) {
-            throw Error("GitService GetReleases Data Is Null")
-        }
-
-        var resArray: GitRelease[] = [];
-        foreach(var item in data)
-        {
-            resArray.Add(new GitRelease(item));
-        }
-        return new ServiceResponse<IEnumerable<GitRelease>>(resArray, isSuccesful: true);
+    let headers = {
+        "Authorization": "token " + token
     }
-    catch (MyException ex)
-    {
-        return new ServiceResponse<IEnumerable<GitRelease>>(messages: "GitService GetReleases: " + ex.MessagesToShow, messagesToShow: ex.MessagesToShow, content: null, isSuccesful: false);
+
+    let data = await getRequest<GitHubRelease[]>(endpoint, headers)
+    if (data == null) {
+        throw Error("GitService GetReleases Data Is Null")
     }
-    catch (Exception ex)
-    {
-        _logger.LogError("Exception caught in GitService GetReleases: {0}", ex);
-        throw;
-    }
+
+    var resArray: GitRelease[] = [];
+    data.forEach((item) => {
+        resArray.push(new GitRelease(item));
+    })
+    return resArray
 }
 
 function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): ServiceResponse<any> {
@@ -83,8 +71,8 @@ function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Serv
 
 export function getTranslationReleaseAsync(repositoryName: string): ServiceResponse<GitHubTranslationRelease[]> {
     var releases = await getReleases(repositoryName);
-    if (releases == null || releases.Content == null || !releases.IsSuccesful) {
-        return new ServiceResponse<GitHubTranslationRelease[]>(messages: releases?.Messages ?? "GetTranslationReleaseAsync GetReleasesAsync Error", null, isSuccesful: false);
+    if (releases == null) {
+        throw Error("GetTranslationReleaseAsync GetReleasesAsync Error")
     }
 
     var result = releases.Content.ToList().ConvertAll(item => {
