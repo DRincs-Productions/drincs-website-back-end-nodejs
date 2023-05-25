@@ -60,10 +60,10 @@ export async function getTranslationRelease(repositoryName: string): Promise<Git
 
     var result: GitHubTranslationRelease[] = releases.map((item) => {
         var b = new GitHubTranslationRelease();
-        b.Version = item.tagName?.split('/')[1];
-        b.Language = item.tagName?.split('/')[0];
-        b.DownloadUrl = item.assets && (item.assets?.length || 0) > 0 ? item.assets[0].browser_download_url : ""
-        b.Date = item.publishedAt;
+        b.version = item.tagName?.split('/')[1];
+        b.language = item.tagName?.split('/')[0];
+        b.downloadUrl = item.assets && (item.assets?.length || 0) > 0 ? item.assets[0].browser_download_url : ""
+        b.date = item.publishedAt;
         return b;
     })
 
