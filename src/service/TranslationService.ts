@@ -1,6 +1,6 @@
 import { ServiceResponse } from "../models/ServiceResponse";
 import { TranslationResult, TranslationResultItem } from "../models/translation/TranslationResult";
-import { getTranslationReleaseAsync as getTranslationRelease } from "./GitHubService";
+import { getTranslationRelease } from "./GitHubService";
 
 export function getTranslations(repositoryName: string, crowdinProjectId: string): ServiceResponse<TranslationResult> {
     console.info("Start Translation GetTranslationsAsync");
