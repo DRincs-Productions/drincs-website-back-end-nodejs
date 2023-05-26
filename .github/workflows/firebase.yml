@@ -35,6 +35,7 @@ jobs:
         npm install
         npm ci
         npm run build
+        $ cp -R /public /build
     - name: Archive Build
       uses: actions/upload-artifact@v2
       with:

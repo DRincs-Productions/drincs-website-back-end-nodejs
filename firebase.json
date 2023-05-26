@@ -1,17 +1,17 @@
 {
-    "hosting": {
-      "site": "drincs-website-back-end",
-      "public": "build",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**",
-          "function": "app"
-        }
-      ]
-    }
+  "hosting": {
+    "site": "drincs-website-back-end",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "app"
+      }
+    ]
+  }
 }
