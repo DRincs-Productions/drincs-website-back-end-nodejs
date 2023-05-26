@@ -1,15 +1,5 @@
 {
   "projects": {
     "default": "drincs-website"
-  },
-  "targets": {
-    "drincs-website-back-end": {
-      "hosting": {
-        "drincs-website": [
-          "drincs-website-back-end"
-        ]
-      }
-    }
-  },
-  "etags": {}
+  }
 }
