@@ -5,7 +5,7 @@ import { GitRelease } from "../models/git/GitRelease";
 import { isNullOrEmpty } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
-const token = ""
+const token = process.env.REACT_APP_API_KEY_TWITTER
 
 async function getReleases(repositoryName: string): Promise<GitRelease[]> {
     let endpoint: string = "repos/" + repositoryName + "/releases";
