@@ -10,7 +10,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/src/app.ts",
+            "program": "${workspaceFolder}/src/index.ts",
             "preLaunchTask": "TypeScript compilation",
             "outFiles": ["${workspaceFolder}/build/**/*.js"]
         }      
