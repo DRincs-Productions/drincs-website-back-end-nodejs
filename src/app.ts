@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // add routes
 new TranslationController(app, "api/translation")
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     console.info("Home")
     res.send("this is the drincs-website-back-end")
 })
