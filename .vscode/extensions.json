@@ -5,6 +5,7 @@
         "ms-vscode.vscode-typescript-next",
         "adrianwilczynski.csharp-to-typescript",
         "aaron-bond.better-comments",
-        "dbaeumer.vscode-eslint"
+        "dbaeumer.vscode-eslint",
+        "github.vscode-github-actions"
     ]
 }
