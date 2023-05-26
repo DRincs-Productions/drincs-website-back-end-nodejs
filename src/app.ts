@@ -4,11 +4,13 @@ import { TranslationController } from "./controllers/TranslationController";
 
 // env
 let dotenv = require('dotenv');
+let cors = require('cors');
 dotenv.config();
 const port = process.env.PORT || 5000;
 
 const app: Express = express();
 
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
