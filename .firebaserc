@@ -3,9 +3,9 @@
     "default": "drincs-website"
   },
   "targets": {
-    "drincs-website": {
+    "drincs-website-back-end": {
       "hosting": {
-        "drincs-website-back-end": [
+        "drincs-website": [
           "drincs-website-back-end"
         ]
       }
