@@ -5,6 +5,8 @@ import { TranslationController } from "./controllers/TranslationController";
 // env
 let dotenv = require('dotenv');
 let cors = require('cors');
+let firebase_functions = require("firebase-functions");
+
 dotenv.config();
 const port = process.env.PORT || 5000;
 
@@ -23,3 +25,5 @@ app.get("/", (req, res) => {
 })
 
 app.listen(port, () => console.info(`Server is running on port ${port}!`));
+
+exports.app = firebase_functions.https.onRequest(app);

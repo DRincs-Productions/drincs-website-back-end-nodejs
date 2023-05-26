@@ -9,8 +9,8 @@
       "rewrites": [
         {
           "source": "**",
-          "destination": "/out/app.js"
+          "“function”": "“app”"
         }
       ]
     }
-  }
+}
