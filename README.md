@@ -4,4 +4,4 @@ ts-node-esm .\src\app.ts
 
 
 # generate a deploy token
-firebase login:ci
+https://cloud.google.com/docs/authentication/client-libraries?hl=it
