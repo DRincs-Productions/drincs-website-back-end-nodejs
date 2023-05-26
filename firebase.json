@@ -1,5 +1,6 @@
 {
     "hosting": {
+      "site": "drincs-website-back-end",
       "public": "build",
       "ignore": [
         "firebase.json",
