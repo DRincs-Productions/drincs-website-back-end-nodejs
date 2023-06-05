@@ -4,11 +4,5 @@
   "public": false,
   "github": {
     "enabled": false
-  },
-  "builds": [
-    {
-      "src": "functions",
-      "use": "@vercel/fstatic"
-    }
-  ]
+  }
 }
