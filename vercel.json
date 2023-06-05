@@ -1,10 +1,14 @@
+// https://vercel.com/docs/concepts/projects/project-configuration#public
 {
-    "version": 2,
-    "public": false,
-    "github": {
-      "enabled": false
-    },
-    "builds": [
-      { "src": "functions", "use": "@vercel/static" }
-    ]  
+  "version": 2,
+  "public": false,
+  "github": {
+    "enabled": false
+  },
+  "builds": [
+    {
+      "src": "functions",
+      "use": "@vercel/fstatic"
+    }
+  ]
 }
