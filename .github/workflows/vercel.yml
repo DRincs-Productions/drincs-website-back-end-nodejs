@@ -34,8 +34,9 @@ jobs:
         npm ci
         npm run build
         mkdir build
-        mv out build
-        cp vercel.json build
+        mv out functions
+        cp -R public build
+        cp -R functions build
     - name: Archive Build
       uses: actions/upload-artifact@v2
       with:
@@ -62,4 +63,4 @@ jobs:
           # vercel-args: '--prod' #Optional
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}  #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required 
-          working-directory: ./
+          working-directory: build
