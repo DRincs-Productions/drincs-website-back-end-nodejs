@@ -1,8 +1,19 @@
-// https://vercel.com/docs/concepts/projects/project-configuration#public
 {
   "version": 2,
   "public": false,
   "github": {
     "enabled": false
-  }
+  },
+  "builds": [
+    {
+      "src": "app.js",
+      "use": "@now/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "(.*)",
+      "dest": "app.js"
+    }
+  ]
 }
