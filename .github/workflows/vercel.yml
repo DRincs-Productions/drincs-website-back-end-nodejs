@@ -46,8 +46,8 @@ jobs:
         name: build
         path: build
 
-  // https://github.com/marketplace/actions/vercel-action
-  // https://github.com/vercel/vercel/discussions/4367#discussioncomment-1672222
+  # https://github.com/marketplace/actions/vercel-action
+  # https://github.com/vercel/vercel/discussions/4367#discussioncomment-1672222
   deploy:
     name: Deploy
     needs: build
