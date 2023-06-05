@@ -37,9 +37,6 @@ jobs:
         mv out functions
         cp -R public build
         cp -R functions build
-        cp -R node_modules build
-        cp package-lock.json build
-        cp package.json build
     - name: Archive Build
       uses: actions/upload-artifact@v2
       with:
