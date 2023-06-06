@@ -28,7 +28,7 @@ jobs:
       - name: npm install and ci and build
         # IMPORTANT: there must not be the ability to download the built because inside who are the keys
         run: |
-          echo -e "\API_KEY_CROWDIN=${{ secrets.API_KEY_CROWDIN }}" >> .env
+          echo -e "\nAPI_KEY_CROWDIN=${{ secrets.API_KEY_CROWDIN }}" >> .env
           echo -e "API_KEY_GITHUB=${{ secrets.API_KEY_GITHUB }}" >> .env
           npm install
           npm ci
