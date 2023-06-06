@@ -40,6 +40,7 @@ jobs:
       - name: Add env
         # IMPORTANT: there must not be the ability to download the built because inside who are the keys
         run: |
+          echo -e "test" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "\nAPI_KEY_CROWDIN=${{ secrets.API_KEY_CROWDIN }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "API_KEY_GITHUB=${{ secrets.API_KEY_GITHUB }}" >> .vercel/output/functions/out/app.js.func/.env
       - name: Deploy Project Artifacts to Vercel
