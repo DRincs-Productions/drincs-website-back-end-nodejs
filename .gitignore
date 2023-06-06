@@ -24,3 +24,4 @@ yarn-error.log*
 
 /out
 firebase-debug.log
+.vercel
