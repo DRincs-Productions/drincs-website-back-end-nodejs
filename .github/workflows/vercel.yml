@@ -6,8 +6,6 @@ name: Vercel CI
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  API_KEY_CROWDIN: ${{ secrets.API_KEY_CROWDIN }}
-  API_KEY_GITHUB: ${{ secrets.API_KEY_GITHUB }}
 
 on:
   push:
@@ -28,6 +26,9 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: npm install and ci and build
+        env:
+          API_KEY_CROWDIN: ${{ secrets.API_KEY_CROWDIN }}
+          API_KEY_GITHUB: ${{ secrets.API_KEY_GITHUB }}
         run: |
           npm install
           npm ci
