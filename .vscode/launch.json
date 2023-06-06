@@ -12,7 +12,7 @@
             "name": "Launch Program",
             "program": "${workspaceFolder}/src/app.ts",
             "preLaunchTask": "TypeScript compilation",
-            "outFiles": ["${workspaceFolder}/build/**/*.js"]
+            "outFiles": ["${workspaceFolder}/out/**/*.js"]
         }      
     ]
 }
