@@ -5,8 +5,10 @@ import { GitRelease } from "../models/git/GitRelease";
 import { isNullOrEmpty } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
+const endpoint = "https://api.github.com/"
+
 async function getReleases(repositoryName: string): Promise<GitRelease[]> {
-    let endpoint: string = "repos/" + repositoryName + "/releases";
+    let link: string = endpoint + "repos/" + repositoryName + "/releases";
     let token = process.env.API_KEY_GITHUB
 
     if (isNullOrEmpty(repositoryName)) {
@@ -20,7 +22,7 @@ async function getReleases(repositoryName: string): Promise<GitRelease[]> {
         "Authorization": "token " + token
     }
 
-    let data = await getRequestWithHeaders<GitHubRelease[]>(endpoint, headers)
+    let data = await getRequestWithHeaders<GitHubRelease[]>(link, headers)
     if (!data) {
         throw Error("GitService GetReleases Data Is Null")
     }
@@ -33,7 +35,7 @@ async function getReleases(repositoryName: string): Promise<GitRelease[]> {
 }
 
 async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
-    let endpoint: string = "repos/" + repositoryName + "/issues";
+    let link: string = endpoint + "repos/" + repositoryName + "/issues";
     let token = process.env.API_KEY_GITHUB
 
     if (isNullOrEmpty(repositoryName)) {
@@ -49,7 +51,7 @@ async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody)
         "Content-Type": "application/json",
     }
 
-    return (await postRequest<any>(endpoint, issue, headers))
+    return (await postRequest<any>(link, issue, headers))
 }
 
 export async function getTranslationRelease(repositoryName: string): Promise<GitHubTranslationRelease[]> {

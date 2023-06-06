@@ -3,8 +3,10 @@ import { CrowdinProjectInfo } from "../models/translation/CrowdinProjectInfo";
 import { isNullOrEmpty } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders } from "./BaseRestService";
 
+let endpoint: string = "https://api.crowdin.com/api/v2/"
+
 export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
-    let endpoint: string = "projects/" + projectId;
+    let link: string = endpoint + "projects/" + projectId;
     let token = process.env.API_KEY_CROWDIN
 
     if (isNullOrEmpty(projectId)) {
@@ -19,7 +21,7 @@ export async function getProject(projectId: string): Promise<CrowdinProjectInfo>
         "Authorization": "Bearer " + token
     }
 
-    let data = await getRequestWithHeaders<CrowdinProjectInfo>(endpoint, headers)
+    let data = await getRequestWithHeaders<CrowdinProjectInfo>(link, headers)
 
     if (!data) {
         throw Error("CrowdinService GetProject Data Is Null")
@@ -28,7 +30,7 @@ export async function getProject(projectId: string): Promise<CrowdinProjectInfo>
 }
 
 export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLanguagesData[]> {
-    let endpoint: string = "projects/" + projectId + "/languages/progress";
+    let link: string = endpoint + "projects/" + projectId + "/languages/progress";
     let token = process.env.API_KEY_CROWDIN
 
     if (isNullOrEmpty(projectId)) {
@@ -43,7 +45,7 @@ export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLangu
         "Authorization": "Bearer " + token
     }
 
-    let data = await getRequestWithHeaders<CrowdinLanguages>(endpoint, headers)
+    let data = await getRequestWithHeaders<CrowdinLanguages>(link, headers)
 
     if (!data || !data.data) {
         throw Error("CrowdinService GetLanguages Data Is Null")
