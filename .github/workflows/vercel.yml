@@ -10,49 +10,13 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [19.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: npm install and ci and build
-      env:
-        REACT_APP_API_KEY_CROWDIN: ${{ secrets.API_KEY_CROWDIN }}
-        REACT_APP_API_KEY_GITHUB: ${{ secrets.API_KEY_GITHUB }}
-      run: |
-        npm install
-        npm ci
-        npm run build
-        mv out build
-    - name: Archive Build
-      uses: actions/upload-artifact@v3
-      with:
-        name: build
-        path: build
-
   # https://github.com/marketplace/actions/vercel-action
   # https://github.com/vercel/vercel/discussions/4367#discussioncomment-1672222
   deploy:
     name: Deploy
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Download Build
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: build
       - uses: amondnet/vercel-action@v25 #deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
@@ -60,4 +24,4 @@ jobs:
           # vercel-args: '--prod' #Optional
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}  #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required 
-          working-directory: build
+          working-directory: ./
