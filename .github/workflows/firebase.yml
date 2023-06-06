@@ -29,8 +29,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install and ci and build
       env:
-        REACT_APP_API_KEY_CROWDIN: ${{ secrets.API_KEY_CROWDIN }}
-        REACT_APP_API_KEY_GITHUB: ${{ secrets.API_KEY_GITHUB }}
+        API_KEY_CROWDIN: ${{ secrets.API_KEY_CROWDIN }}
+        API_KEY_GITHUB: ${{ secrets.API_KEY_GITHUB }}
       run: |
         npm install
         npm ci
