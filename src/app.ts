@@ -21,7 +21,7 @@ new TranslationController(app, "/api/translation")
 
 app.get("/api", (req, res) => {
     console.info("Home")
-    res.send("this is the drincs-website-back-end")
+    res.send(`this is the drincs-website-back-end (running on port ${port})`)
 })
 
 app.listen(port, () => console.info(`Server is running on port ${port}!`));
