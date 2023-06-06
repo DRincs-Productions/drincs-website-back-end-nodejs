@@ -6,14 +6,19 @@
   },
   "builds": [
     {
-      "src": "app.js",
-      "use": "@now/node"
+      "src": "out/app.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "out/**"
+        ]
+      }
     }
   ],
   "routes": [
     {
-      "src": "(.*)",
-      "dest": "app.js"
+      "src": "/(.*)",
+      "dest": "out/app.js"
     }
   ]
 }
