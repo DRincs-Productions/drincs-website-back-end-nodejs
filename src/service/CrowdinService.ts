@@ -3,7 +3,7 @@ import { CrowdinProjectInfo } from "../models/translation/CrowdinProjectInfo";
 import { isNullOrEmpty } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders } from "./BaseRestService";
 
-const token = process.env.REACT_APP_API_KEY_TWITTER
+const token = process.env.API_KEY_CROWDIN
 
 export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
     let endpoint: string = "projects/" + projectId;

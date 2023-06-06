@@ -17,7 +17,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // add routes
-new TranslationController(app, "api/translation")
+new TranslationController(app, "/api/translation")
 
 app.get("/api", (req, res) => {
     console.info("Home")
