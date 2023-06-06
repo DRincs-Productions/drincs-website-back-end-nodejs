@@ -5,10 +5,9 @@ import { GitRelease } from "../models/git/GitRelease";
 import { isNullOrEmpty } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
-const token = process.env.API_KEY_GITHUB
-
 async function getReleases(repositoryName: string): Promise<GitRelease[]> {
     let endpoint: string = "repos/" + repositoryName + "/releases";
+    let token = process.env.API_KEY_GITHUB
 
     if (isNullOrEmpty(repositoryName)) {
         throw Error("GitService GetReleases repositoryName Is Null Or Empty")
@@ -35,6 +34,7 @@ async function getReleases(repositoryName: string): Promise<GitRelease[]> {
 
 async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
     let endpoint: string = "repos/" + repositoryName + "/issues";
+    let token = process.env.API_KEY_GITHUB
 
     if (isNullOrEmpty(repositoryName)) {
         throw Error("GitService CreateIssue repositoryName Is Null Or Empty")
