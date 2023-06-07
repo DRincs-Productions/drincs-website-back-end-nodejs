@@ -1,8 +1,8 @@
 import bodyParser from "body-parser";
 import express, { Express } from 'express';
-import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { TranslationController } from "./controllers/TranslationController";
+import { logInfo } from "./utility/Logger";
 
 // Initialize Firebase
 let firebaseConfig = {
@@ -14,8 +14,8 @@ let firebaseConfig = {
     appId: process.env.FIREBASE_WEBSITE_WEBAPI_APPID,
     measurementId: process.env.FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID,
 };
-const firebase = initializeApp(firebaseConfig);
-const analytics = getAnalytics(firebase);
+
+initializeApp(firebaseConfig)
 
 // env
 let dotenv = require('dotenv');
@@ -35,11 +35,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 new TranslationController(app, "/api/translation")
 
 app.get("/api", (req, res) => {
-    console.info("Home")
+    logInfo("Home")
     res.send(`This is the drincs-website-back-end`)
 })
 
-app.listen(port, () => console.info(`Server is running on port ${port}!`));
+app.listen(port, () => logInfo(`Server is running on port ${port}!`));
 
 // * for firebase Hosting (now not used)
 exports.app = firebase_functions.https.onRequest(app);

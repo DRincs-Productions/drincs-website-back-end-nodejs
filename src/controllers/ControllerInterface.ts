@@ -2,12 +2,13 @@ import { Express, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { HttpResponse } from '../models/HttpResponse';
 import { MyError } from '../models/MyError';
+import { logInfo } from '../utility/Logger';
 
 abstract class ControllerInterface {
     constructor(app: Express, route: string) {
         this.app = app
         this.route = route
-        console.info("Route added: " + route)
+        logInfo("Route added: " + route)
     }
     private app: Express
     private route: string

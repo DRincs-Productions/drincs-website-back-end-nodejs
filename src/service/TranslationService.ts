@@ -1,9 +1,10 @@
 import { TranslationResult, TranslationResultItem } from "../models/translation/TranslationResult";
+import { logInfo } from "../utility/Logger";
 import { GetLanguagesAsync as getLanguages, getProject } from "./CrowdinService";
 import { getTranslationRelease } from "./GitHubService";
 
 export async function getTranslations(repositoryName: string, crowdinProjectId: string): Promise<TranslationResult> {
-    console.info("Start Translation GetTranslationsAsync")
+    logInfo("Start Translation GetTranslationsAsync")
     var releases = await getTranslationRelease(repositoryName)
     var projectInfo = await getProject(crowdinProjectId)
     var languages = await getLanguages(crowdinProjectId)
