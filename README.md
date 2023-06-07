@@ -11,4 +11,6 @@ ts-node-esm ./src/app.ts
 
 # firebase
 ## generate a deploy token
+```shell
 firebase init hosting:github
+```
