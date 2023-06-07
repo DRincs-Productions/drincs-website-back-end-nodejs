@@ -18,7 +18,7 @@ const firebaseApp = initializeApp(firebaseConfig())
 export function getFirebaseAnalytics() {
     // https://stackoverflow.com/questions/59400315/is-it-possible-to-setup-firebase-analytics-from-an-express-server
     try {
-        return getAnalytics(firebaseApp);
+        return getAnalytics(firebaseApp)
     }
     catch (ex) {
         return
