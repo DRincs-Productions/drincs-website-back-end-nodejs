@@ -1,21 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Express } from 'express';
-import { initializeApp } from "firebase/app";
 import { TranslationController } from "./controllers/TranslationController";
 import { logInfo, logTest } from "./utility/Logger";
-
-// Initialize Firebase
-let firebaseConfig = {
-    apiKey: process.env.FIREBASE_WEBSITE_WEBAPI_APIKEY,
-    authDomain: process.env.FIREBASE_WEBSITE_WEBAPI_AUTHDOMAIN,
-    projectId: process.env.FIREBASE_WEBSITE_WEBAPI_PROJECTID,
-    storageBucket: process.env.FIREBASE_WEBSITE_WEBAPI_STORAGEBUCKET,
-    messagingSenderId: process.env.FIREBASE_WEBSITE_WEBAPI_MESSAGINGSENDERID,
-    appId: process.env.FIREBASE_WEBSITE_WEBAPI_APPID,
-    measurementId: process.env.FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID,
-};
-
-initializeApp(firebaseConfig)
 
 // env
 let dotenv = require('dotenv');
