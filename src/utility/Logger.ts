@@ -60,3 +60,19 @@ export function logError(message: string, body: any = undefined) {
 
     console.info(message, body)
 }
+
+export function logTest(): boolean {
+    if (process.env.NODE_ENV !== 'production') {
+        return false
+    }
+    try {
+        let analytics = getAnalytics();
+        logEvent(analytics, 'test', {
+            message: "test",
+            body: {},
+        });
+        return true
+    } catch (ex) {
+        return false
+    }
+}

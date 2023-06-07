@@ -2,7 +2,7 @@ import bodyParser from "body-parser";
 import express, { Express } from 'express';
 import { initializeApp } from "firebase/app";
 import { TranslationController } from "./controllers/TranslationController";
-import { logInfo } from "./utility/Logger";
+import { logInfo, logTest } from "./utility/Logger";
 
 // Initialize Firebase
 let firebaseConfig = {
@@ -37,6 +37,10 @@ new TranslationController(app, "/api/translation")
 app.get("/api", (req, res) => {
     logInfo("Home")
     res.send(`This is the drincs-website-back-end`)
+})
+
+app.get("/api/test/logger", (req, res) => {
+    res.send(logTest())
 })
 
 app.listen(port, () => logInfo(`Server is running on port ${port}!`));
