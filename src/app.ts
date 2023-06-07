@@ -1,6 +1,21 @@
 import bodyParser from "body-parser";
 import express, { Express } from 'express';
+import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from "firebase/app";
 import { TranslationController } from "./controllers/TranslationController";
+
+// Initialize Firebase
+let firebaseConfig = {
+    apiKey: process.env.FIREBASE_WEBSITE_WEBAPI_APIKEY,
+    authDomain: process.env.FIREBASE_WEBSITE_WEBAPI_AUTHDOMAIN,
+    projectId: process.env.FIREBASE_WEBSITE_WEBAPI_PROJECTID,
+    storageBucket: process.env.FIREBASE_WEBSITE_WEBAPI_STORAGEBUCKET,
+    messagingSenderId: process.env.FIREBASE_WEBSITE_WEBAPI_MESSAGINGSENDERID,
+    appId: process.env.FIREBASE_WEBSITE_WEBAPI_APPID,
+    measurementId: process.env.FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID,
+};
+const firebase = initializeApp(firebaseConfig);
+const analytics = getAnalytics(firebase);
 
 // env
 let dotenv = require('dotenv');
@@ -26,4 +41,5 @@ app.get("/api", (req, res) => {
 
 app.listen(port, () => console.info(`Server is running on port ${port}!`));
 
+// * for firebase Hosting (now not used)
 exports.app = firebase_functions.https.onRequest(app);
