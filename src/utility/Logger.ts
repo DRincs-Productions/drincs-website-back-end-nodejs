@@ -61,9 +61,9 @@ export function logError(message: string, body: any = undefined) {
     console.info(message, body)
 }
 
-export function logTest(): boolean {
+export function logTest(): string {
     if (process.env.NODE_ENV !== 'production') {
-        return false
+        return "it is not a production environment"
     }
     try {
         let analytics = getAnalytics();
@@ -71,8 +71,8 @@ export function logTest(): boolean {
             message: "test",
             body: {},
         });
-        return true
+        return true.toString()
     } catch (ex) {
-        return false
+        return false.toString()
     }
 }
