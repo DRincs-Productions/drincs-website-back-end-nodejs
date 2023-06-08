@@ -9,7 +9,7 @@ export class TranslationController extends ControllerInterface {
     constructor(app: Express, route: string) {
         super(app, route)
 
-        app.get<string, any, HttpResponse<TranslationResult>, any, { repositoryName: string, crowdinProjectId: string }>(route + "/gettranslations", (req, res) => {
+        app.get<string, any, HttpResponse<TranslationResult>, any, { repositoryName: string, crowdinProjectId: string }>(route + "/GetTranslations", (req, res) => {
             logInfo("Start Translation GetTranslations")
             try {
                 getTranslations(req.query.repositoryName, req.query.crowdinProjectId).then((value) => {
