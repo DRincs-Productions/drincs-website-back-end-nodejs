@@ -1,6 +1,6 @@
 import { Logtail } from "@logtail/node";
 
-export function logInfo(message: string, body: any = undefined) {
+export function logInfo(message: string, body: any = "") {
     if (process.env.NODE_ENV === 'production') {
         try {
             let logtail = new Logtail(process.env.LOGTAIL_WEBAPI_KEY || "");
@@ -13,7 +13,7 @@ export function logInfo(message: string, body: any = undefined) {
 }
 
 
-export function logWarn(message: string, body: any = undefined) {
+export function logWarn(message: string, body: any = "") {
     if (process.env.NODE_ENV === 'production') {
         try {
             let logtail = new Logtail(process.env.LOGTAIL_WEBAPI_KEY || "");
@@ -25,7 +25,7 @@ export function logWarn(message: string, body: any = undefined) {
     console.info(message, body)
 }
 
-export function logError(message: string, body: any = undefined) {
+export function logError(message: string, body: any = "") {
     if (process.env.NODE_ENV === 'production') {
         try {
             let logtail = new Logtail(process.env.LOGTAIL_WEBAPI_KEY || "");

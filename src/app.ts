@@ -1,5 +1,6 @@
 import bodyParser from "body-parser";
 import express, { Express } from 'express';
+import { GitHubController } from "./controllers/GitHubController";
 import { TranslationController } from "./controllers/TranslationController";
 import { logInfo, logTest } from "./utility/Logger";
 
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 // add routes
 new TranslationController(app, "/api/translation")
+new GitHubController(app, "/api/github")
 
 app.get("/api", (req, res) => {
     logInfo("Home")

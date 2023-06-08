@@ -7,7 +7,7 @@ import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
 const endpoint = "https://api.github.com/"
 
-async function getReleases(repositoryName: string): Promise<GitRelease[]> {
+export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
     let link: string = endpoint + "repos/" + repositoryName + "/releases";
     let token = process.env.API_KEY_GITHUB
 
@@ -34,7 +34,7 @@ async function getReleases(repositoryName: string): Promise<GitRelease[]> {
     return resArray
 }
 
-async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
+export async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
     let link: string = endpoint + "repos/" + repositoryName + "/issues";
     let token = process.env.API_KEY_GITHUB
 
