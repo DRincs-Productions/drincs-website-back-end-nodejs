@@ -2,6 +2,11 @@ export function isNullOrEmpty(value: any) {
     return (!value || value.toString() === "")
 }
 
+
+export function IsNullOrWhiteSpace(value: any) {
+    return isNullOrEmpty(value) || str.match(/^ *$/) !== null;
+}
+
 export function isObject(obj: any) {
     let type = typeof obj;
     return (type === 'object' && !!obj);

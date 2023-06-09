@@ -1,7 +1,7 @@
 import { MyError } from "../models/MyError";
 import { DiscordTokenRespons } from "../models/auth/DiscordTokenRespons";
 import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
-import { getWebApiUrl, isNullOrEmpty } from "../utility/UtilityFunctionts";
+import { getWebApiUrl, isNullOrEmptyOrWhiteSpace } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
 export async function geToken(code: string): Promise<string> {
@@ -30,7 +30,7 @@ export async function geToken(code: string): Promise<string> {
 }
 
 export async function getUserInfo(token: string): Promise<DiscordUserInfo> {
-    if (isNullOrEmpty(token)) {
+    if (isNullOrEmptyOrWhiteSpace(token)) {
         throw Error("DiscordService GetUserInfoAsync token Is Null Or Empty")
     }
 
