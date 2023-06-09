@@ -27,7 +27,7 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
         throw Error("GitService GetReleases Data Is Null")
     }
 
-    var resArray: GitRelease[] = [];
+    let resArray: GitRelease[] = [];
     data.forEach((item) => {
         resArray.push(new GitRelease(item));
     })
@@ -55,13 +55,13 @@ export async function createIssue(repositoryName: string, issue: GitHubCreateIss
 }
 
 export async function getTranslationRelease(repositoryName: string): Promise<GitHubTranslationRelease[]> {
-    var releases = await getReleases(repositoryName);
+    let releases = await getReleases(repositoryName);
     if (releases == null) {
         throw Error("GetTranslationReleaseAsync GetReleasesAsync Error")
     }
 
-    var result: GitHubTranslationRelease[] = releases.map((item) => {
-        var b = new GitHubTranslationRelease();
+    let result: GitHubTranslationRelease[] = releases.map((item) => {
+        let b = new GitHubTranslationRelease();
         b.version = item.tagName?.split('/')[1];
         b.language = item.tagName?.split('/')[0];
         b.downloadUrl = item.assets && (item.assets?.length || 0) > 0 ? item.assets[0].browser_download_url : ""
