@@ -1,5 +1,7 @@
+import * as admin from "firebase-admin";
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
+
 
 function firebaseConfig() {
     return {
@@ -15,12 +17,26 @@ function firebaseConfig() {
 
 const firebaseApp = initializeApp(firebaseConfig())
 
+admin.initializeApp({
+    credential: admin.credential.cert("GCP_SERVICE_ACCOUNT")
+})
+
 export function getFirebaseAnalytics() {
     // https://stackoverflow.com/questions/59400315/is-it-possible-to-setup-firebase-analytics-from-an-express-server
     try {
         return getAnalytics(firebaseApp)
     }
     catch (ex) {
-        return
+        throw Error("getFirebaseAnalytics")
+    }
+}
+
+export function getFirebaseAuth() {
+    // https://stackoverflow.com/questions/59400315/is-it-possible-to-setup-firebase-analytics-from-an-express-server
+    try {
+        return admin.auth()
+    }
+    catch (ex) {
+        throw Error("getFirebaseAnalytics")
     }
 }

@@ -29,7 +29,7 @@ export async function geToken(code: string): Promise<string> {
     return data?.access_token
 }
 
-export async function getUserInfoAsync(token: string): Promise<DiscordUserInfo> {
+export async function getUserInfo(token: string): Promise<DiscordUserInfo> {
     if (isNullOrEmpty(token)) {
         throw Error("DiscordService GetUserInfoAsync token Is Null Or Empty")
     }
