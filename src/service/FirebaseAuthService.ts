@@ -5,6 +5,7 @@ import { AuthData } from "../models/auth/AuthData";
 import { LoginAccount } from "../models/auth/LoginAccount";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
+import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
 
 function generateVerificationLink(email: string): string {
     try {
@@ -18,17 +19,7 @@ function generateVerificationLink(email: string): string {
 function createAccount(user: UserRecordArgs): AuthData {
     try {
         var userRecord = await _firebaseAuth.CreateUserAsync(user);
-        var verificationLink = await generateVerificationLink(userRecord.Email);
-        _emailService.sendVerificationLinkMail(user.Email, user.DisplayName, verificationLink);
-        if (userRecord == null) {
-            throw Error("FirebaseAuth CreateAccount Is Not Successful")
-        }
-
-        return new AuthData(userRecord)
-    }
-    catch (MyException ex)
-    {
-        return new ServiceResponse<AuthData>(messages: "FirebaseAuth CreateAccount: " + ex.MessagesToShow, messagesToShow: ex.MessagesToShow, content: null, isSuccesful: false);
+        var verificationLink = await generateVerificationLink(userRecord?.Email);
     }
     catch (ex) {
         if (ex?.HResult == -2147024809) {
@@ -40,29 +31,29 @@ function createAccount(user: UserRecordArgs): AuthData {
         logError("Exception caught in FirebaseAuth CreateAccount: {0}", ex);
         throw Error("Exception caught in FirebaseAuth CreateAccount")
     }
+
+    _emailService.sendVerificationLinkMail(user.Email, user.DisplayName, verificationLink);
+
+    return new AuthData(userRecord)
 }
 
-function resetPassword(email: string): string {
+function resetPassword(email: string) {
     try {
         var link = await getFirebaseAuth().generatePasswordResetLink(email);
-        _emailService.SendResetPasswordMail(email, link);
-        if (link == null) {
-            throw Error("FirebaseAuth ResetPassword Is Not Successful " + email)
-        }
-
-        return email
-    }
-    catch (MyException ex)
-    {
-        return new ServiceResponse<string>(messages: "FirebaseAuth ResetPassword: " + ex.MessagesToShow, messagesToShow: ex.MessagesToShow, content: null, isSuccesful: false);
     }
     catch (ex) {
         if (ex?.HResult == -2146233088) {
             return new ServiceResponse<string>(messages: "FirebaseAuth ResetPassword: The user with the provided email already exists", messagesToShow: "The user with the provided email already exists", content: null, isSuccesful: false);
         }
-        _logger.LogError("Exception caught in FirebaseAuth ResetPassword: {0}", ex);
-        throw;
+        logError("Exception caught in FirebaseAuth ResetPassword: {0}", ex);
+        throw Error("Exception caught in FirebaseAuth ResetPassword")
     }
+
+    if (!link) {
+        throw Error("FirebaseAuth ResetPassword Is Not Successful " + email)
+    }
+
+    _emailService.SendResetPasswordMail(email, link);
 }
 
 function signInWithEmailPassword(loginModel: LoginAccount): AuthData {
@@ -86,7 +77,7 @@ function signInWithEmailPassword(loginModel: LoginAccount): AuthData {
     if (userCredential == null) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Email or Password not Correct")
     }
-    var authData = await GetToken(loginModel.email);
+    var authData = await GetTokenByEmail(loginModel.email);
     if (authData == null) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Is Not Successful")
     }
@@ -99,25 +90,19 @@ function GetSupportRole(userCredential: UserRecord): TypeAccount {
     return TypeAccount.Free;
 }
 
-function GetToken(email?: string): AuthData | undefined {
+function GetTokenByEmail(email?: string): AuthData | undefined {
     if (IsNullOrWhiteSpace(email)) {
-        _logger.LogError("FirebaseAuth GetToken Error email IsNullOrWhiteSpace");
-        // TODO: throw new MyException("Email is null");
-        return null;
+        throw Error("FirebaseAuth GetToken Error email IsNullOrWhiteSpace")
     }
     try {
-                UserRecord userRecord = await _firebaseAuth.GetUserByEmailAsync(email);
-        return GetToken(userRecord);
-    }
-    catch (MyException ex)
-    {
-        throw ex;
+        let userRecord: UserRecord = await _firebaseAuth.GetUserByEmailAsync(email);
     }
     catch (ex) {
         _logger.LogError("Exception caught in FirebaseAuth GetToken: {0}", ex);
         // TODO: throw new MyException("uring the generation of Token");
         return null;
     }
+    return GetToken(userRecord);
 }
 
 function GetToken(userCredential: UserRecord): AuthData | undefined {
@@ -177,7 +162,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
 
 function oAuthDiscordCallback(code: string): string {
     try {
-        string clientUrlOAuthDiscord = _configuration.GetValue<string>("Url:Client")!;
+        let clientUrlOAuthDiscord: string = _configuration.GetValue<string>("Url:Client")!;
 
         var discordPrivateToken = await _discordService.GeToken(code);
 
@@ -197,14 +182,14 @@ function oAuthDiscordCallback(code: string): string {
             return new ServiceResponse<string>(messages: "FirebaseAuth OAuthDiscordCallback: Discord account must be verified", messagesToShow: "Discord account must be verified", content: null, isSuccesful: false);
         }
 
-        var firebaseAuthData = await GetToken(userInfo.Content.email);
+        var firebaseAuthData = await GetTokenByEmail(userInfo.Content.email);
 
         // * User is not registered
         // * Because in case A has a DRincs account, but does not have a Discord account
         // * B using A's email can create an unverified Discord account, and then login to the DRincs account
         if (firebaseAuthData == null) {
             var userRecorder = await CreateAccount(userInfo.Content);
-            firebaseAuthData = await GetToken(userInfo.Content.email);
+            firebaseAuthData = await GetTokenByEmail(userInfo.Content.email);
 
             if (firebaseAuthData == null) {
                 _logger.LogError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");

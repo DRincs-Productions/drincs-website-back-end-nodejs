@@ -4,7 +4,7 @@ export function isNullOrEmpty(value: any) {
 
 
 export function IsNullOrWhiteSpace(value: any) {
-    return isNullOrEmpty(value) || str.match(/^ *$/) !== null;
+    return isNullOrEmpty(value) || value.match(/^ *$/) !== null;
 }
 
 export function isObject(obj: any) {
