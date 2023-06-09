@@ -1,8 +1,10 @@
+import { UserRecord } from "firebase-functions/v1/auth";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { TypeAccount } from "../enum/TypeAccountEnum";
 import { MyError } from "../models/MyError";
 import { AuthData } from "../models/auth/AuthData";
 import { LoginAccount } from "../models/auth/LoginAccount";
+import { UserRecordArgs } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
@@ -18,8 +20,11 @@ function generateVerificationLink(email: string): string {
 
 function createAccount(user: UserRecordArgs): AuthData {
     try {
-        var userRecord = await _firebaseAuth.CreateUserAsync(user);
-        var verificationLink = await generateVerificationLink(userRecord?.Email);
+        var userRecord = await getFirebaseAuth().createUser(user)
+        if (!userRecord?.email) {
+            throw Error("Exception caught in FirebaseAuth CreateAccount: userRecord?.email is null")
+        }
+        var verificationLink = generateVerificationLink(userRecord?.email);
     }
     catch (ex) {
         if (ex?.HResult == -2147024809) {
@@ -91,16 +96,16 @@ function GetSupportRole(userCredential: UserRecord): TypeAccount {
 }
 
 function GetTokenByEmail(email?: string): AuthData | undefined {
+    let userRecord: UserRecord
     if (IsNullOrWhiteSpace(email)) {
         throw Error("FirebaseAuth GetToken Error email IsNullOrWhiteSpace")
     }
     try {
-        let userRecord: UserRecord = await _firebaseAuth.GetUserByEmailAsync(email);
+        userRecord = await _firebaseAuth.GetUserByEmailAsync(email);
     }
     catch (ex) {
-        _logger.LogError("Exception caught in FirebaseAuth GetToken: {0}", ex);
-        // TODO: throw new MyException("uring the generation of Token");
-        return null;
+        logError("Exception caught in FirebaseAuth GetToken: {0}", ex);
+        throw new Error("Exception caught in FirebaseAuth GetToken");
     }
     return GetToken(userRecord);
 }
