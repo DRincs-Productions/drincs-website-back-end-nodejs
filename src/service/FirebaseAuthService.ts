@@ -8,6 +8,7 @@ import { UserRecordArgs } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
+import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
 
 function generateVerificationLink(email: string): string {
     try {
@@ -105,7 +106,7 @@ function GetTokenByEmail(email?: string): AuthData | undefined {
     }
     catch (ex) {
         logError("Exception caught in FirebaseAuth GetToken: {0}", ex);
-        throw new Error("Exception caught in FirebaseAuth GetToken");
+        throw Error("Exception caught in FirebaseAuth GetToken");
     }
     return GetToken(userRecord);
 }
@@ -169,36 +170,28 @@ function oAuthDiscordCallback(code: string): string {
     try {
         let clientUrlOAuthDiscord: string = _configuration.GetValue<string>("Url:Client")!;
 
-        var discordPrivateToken = await _discordService.GeToken(code);
+        var discordPrivateToken = await geTokenDiscord(code);
 
-        if (!discordPrivateToken.IsSuccesful || discordPrivateToken.Content == null) {
-            return new ServiceResponse<string>(messages: discordPrivateToken.Messages ?? "", messagesToShow: discordPrivateToken.MessagesToShow ?? "", content: null, isSuccesful: false);
-        }
-
-        var userInfo = await _discordService.GetUserInfoAsync(discordPrivateToken.Content);
-
-        if (!userInfo.IsSuccesful || userInfo.Content == null) {
-            return new ServiceResponse<string>(messages: userInfo.Messages ?? "", messagesToShow: userInfo.MessagesToShow ?? "", content: null, isSuccesful: false);
-        }
+        var userInfo = await getUserInfoDiscord(discordPrivateToken);
 
         // * User must be verified
-        if (!userInfo.Content.verified) {
-            _logger.LogError("FirebaseAuth OAuthDiscordCallback: Discord account must be verified");
-            return new ServiceResponse<string>(messages: "FirebaseAuth OAuthDiscordCallback: Discord account must be verified", messagesToShow: "Discord account must be verified", content: null, isSuccesful: false);
+        if (!userInfo.verified) {
+            logError("FirebaseAuth OAuthDiscordCallback: Discord account must be verified");
+            throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
         }
 
-        var firebaseAuthData = await GetTokenByEmail(userInfo.Content.email);
+        var firebaseAuthData = await GetTokenByEmail(userInfo.email);
 
         // * User is not registered
         // * Because in case A has a DRincs account, but does not have a Discord account
         // * B using A's email can create an unverified Discord account, and then login to the DRincs account
         if (firebaseAuthData == null) {
-            var userRecorder = await CreateAccount(userInfo.Content);
-            firebaseAuthData = await GetTokenByEmail(userInfo.Content.email);
+            var userRecorder = await CreateAccount(userInfo);
+            firebaseAuthData = await GetTokenByEmail(userInfo.email);
 
             if (firebaseAuthData == null) {
-                _logger.LogError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");
-                return new ServiceResponse<string>(messages: "FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error", messagesToShow: "There was an error when creating the account", content: null, isSuccesful: false);
+                logError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");
+                throw new MyError("There was an error when creating the account", "FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error")
             }
         }
 

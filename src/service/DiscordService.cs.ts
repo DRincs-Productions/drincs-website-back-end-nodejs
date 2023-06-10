@@ -4,7 +4,7 @@ import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
 import { IsNullOrWhiteSpace, getWebApiUrl, } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
-export async function geToken(code: string): Promise<string> {
+export async function geTokenDiscord(code: string): Promise<string> {
     // https://miniorange.com/atlassian/rest-api-authentication-using-discord-as-oauth-provider/
     let clientId = process.env.API_KEY_DISCORD_CLIENT_ID
     let clientSecret = process.env.API_KEY_DISCORD_CLIENT_SECRET
@@ -29,7 +29,7 @@ export async function geToken(code: string): Promise<string> {
     return data?.access_token
 }
 
-export async function getUserInfo(token: string): Promise<DiscordUserInfo> {
+export async function getUserInfoDiscord(token: string): Promise<DiscordUserInfo> {
     if (IsNullOrWhiteSpace(token)) {
         throw Error("DiscordService GetUserInfoAsync token Is Null Or Empty")
     }
