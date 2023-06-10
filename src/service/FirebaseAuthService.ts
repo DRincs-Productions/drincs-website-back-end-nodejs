@@ -4,12 +4,38 @@ import { sign } from "jsonwebtoken/index";
 import { TypeAccount } from "../enum/TypeAccountEnum";
 import { MyError } from "../models/MyError";
 import { AuthData } from "../models/auth/AuthData";
+import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
 import { LoginAccount } from "../models/auth/LoginAccount";
-import { UserRecordArgs } from "../models/firebase/UserRecordArgs";
+import { UserRecordArgs, UserRecordArgsCreate } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace, getClientUrl } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
+
+async function createAccountNewAccountRecord(user: NewAccountRecord): Promise<AuthData> {
+    let defaultUserIcon: string = _configuration.GetValue<string>("Url:DefaultUserIcon")!;
+    let args: UserRecordArgsCreate = new UserRecordArgsCreate(
+        user.Email,
+        user.DisplayName,
+        false,
+        user.PhotoUrl.IsNullOrEmpty() ? defaultUserIcon : user.PhotoUrl,
+        false,
+        user.Password
+    )
+    return await createAccount(args);
+}
+
+async function createAccountDiscordUserInfo(user: DiscordUserInfo): Promise<AuthData> {
+    let args: UserRecordArgsCreate = new UserRecordArgsCreate(
+        user.email,
+        user.username,
+        user.verified,
+        "https://cdn.discordapp.com/avatars/" + user.id + "/" + user.avatar + ".png",
+        false,
+        RandomString(40), // TODO questo dovrebbe essere cambiato
+    )
+    return await createAccount(args);
+}
 
 async function generateVerificationLink(email: string): Promise<string> {
     try {
@@ -157,7 +183,7 @@ async function oAuthDiscordCallback(code: string): Promise<string> {
     // * Because in case A has a DRincs account, but does not have a Discord account
     // * B using A's email can create an unverified Discord account, and then login to the DRincs account
     if (!firebaseAuthData) {
-        let userRecorder = CreateAccount(userInfo);
+        let userRecorder = createAccountDiscordUserInfo(userInfo);
         firebaseAuthData = await GetTokenByEmail(userInfo.email);
 
         if (!firebaseAuthData) {
