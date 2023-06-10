@@ -2,7 +2,6 @@ import * as admin from "firebase-admin";
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 
-
 function firebaseConfig() {
     return {
         apiKey: process.env.FIREBASE_WEBSITE_WEBAPI_APIKEY,
@@ -32,7 +31,6 @@ export function getFirebaseAnalytics() {
 }
 
 export function getFirebaseAuth() {
-    // https://stackoverflow.com/questions/59400315/is-it-possible-to-setup-firebase-analytics-from-an-express-server
     try {
         return admin.auth()
     }

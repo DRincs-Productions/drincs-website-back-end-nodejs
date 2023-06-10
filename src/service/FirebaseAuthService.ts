@@ -21,7 +21,7 @@ function generateVerificationLink(email: string): string {
 function createAccount(user: UserRecordArgs): AuthData {
     try {
         var userRecord = await getFirebaseAuth().createUser(user)
-        if (!userRecord?.email) {
+        if (!userRecord?.email || IsNullOrWhiteSpace(userRecord?.email)) {
             throw Error("Exception caught in FirebaseAuth CreateAccount: userRecord?.email is null")
         }
         var verificationLink = generateVerificationLink(userRecord?.email);
@@ -54,7 +54,7 @@ function resetPassword(email: string) {
         throw Error("Exception caught in FirebaseAuth ResetPassword")
     }
 
-    if (!link) {
+    if (!link || IsNullOrWhiteSpace(link)) {
         throw Error("FirebaseAuth ResetPassword Is Not Successful " + email)
     }
 
@@ -62,10 +62,10 @@ function resetPassword(email: string) {
 }
 
 function signInWithEmailPassword(loginModel: LoginAccount): AuthData {
-    if (!loginModel.email) {
+    if (!loginModel.email || IsNullOrWhiteSpace(loginModel.email)) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync email is null")
     }
-    if (!loginModel.password) {
+    if (!loginModel.password || IsNullOrWhiteSpace(loginModel.password)) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync password is null")
     }
     try {
@@ -97,11 +97,11 @@ function GetSupportRole(userCredential: UserRecord): TypeAccount {
 
 function GetTokenByEmail(email?: string): AuthData | undefined {
     let userRecord: UserRecord
-    if (IsNullOrWhiteSpace(email)) {
+    if (!email || IsNullOrWhiteSpace(email)) {
         throw Error("FirebaseAuth GetToken Error email IsNullOrWhiteSpace")
     }
     try {
-        userRecord = await _firebaseAuth.GetUserByEmailAsync(email);
+        userRecord = await getFirebaseAuth().getUserByEmail(email)
     }
     catch (ex) {
         logError("Exception caught in FirebaseAuth GetToken: {0}", ex);
