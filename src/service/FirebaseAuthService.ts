@@ -7,7 +7,7 @@ import { LoginAccount } from "../models/auth/LoginAccount";
 import { UserRecordArgs } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
-import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
+import { IsNullOrWhiteSpace, getClientUrl } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
 
 function generateVerificationLink(email: string): string {
@@ -167,7 +167,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
 }
 
 function oAuthDiscordCallback(code: string): string {
-    let clientUrlOAuthDiscord: string = _configuration.GetValue<string>("Url:Client")!;
+    let clientUrlOAuthDiscord: string = getClientUrl()
 
     var discordPrivateToken = await geTokenDiscord(code);
 
