@@ -1,5 +1,6 @@
 import { UserRecord } from "firebase-functions/v1/auth";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { sign } from "jsonwebtoken/index";
 import { TypeAccount } from "../enum/TypeAccountEnum";
 import { MyError } from "../models/MyError";
 import { AuthData } from "../models/auth/AuthData";
@@ -9,8 +10,6 @@ import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace, getClientUrl } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
-
-const jwt = require('jsonwebtoken');
 
 async function generateVerificationLink(email: string): Promise<string> {
     try {
@@ -131,7 +130,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
         role: TypeAccount.Free,
     }
 
-    let token = jwt.sign({
+    let token = sign({
         exp: expirationTime,
         data: data
     }, jwtSecret);
@@ -152,14 +151,14 @@ async function oAuthDiscordCallback(code: string): Promise<string> {
         throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
     }
 
-    let firebaseAuthData = GetTokenByEmail(userInfo.email);
+    let firebaseAuthData = await GetTokenByEmail(userInfo.email);
 
     // * User is not registered
     // * Because in case A has a DRincs account, but does not have a Discord account
     // * B using A's email can create an unverified Discord account, and then login to the DRincs account
     if (!firebaseAuthData) {
         let userRecorder = CreateAccount(userInfo);
-        firebaseAuthData = GetTokenByEmail(userInfo.email);
+        firebaseAuthData = await GetTokenByEmail(userInfo.email);
 
         if (!firebaseAuthData) {
             logError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");
