@@ -3,7 +3,7 @@ import { CrowdinProjectInfo } from "../models/translation/CrowdinProjectInfo";
 import { isNullOrEmptyOrWhiteSpace } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders } from "./BaseRestService";
 
-let endpoint: string = "https://api.crowdin.com/api/v2/"
+const endpoint: string = "https://api.crowdin.com/api/v2/"
 
 export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
     let link: string = endpoint + "projects/" + projectId;

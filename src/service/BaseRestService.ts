@@ -16,7 +16,7 @@ export async function getRequest<T>(link: string, headers?: object): Promise<T> 
             }
         }
 
-        const response = await axios.get<T>(link, config);
+        let response = await axios.get<T>(link, config);
         logInfo("BaseRestService get", response);
         return response.data;
     } catch (ex) {
@@ -57,7 +57,7 @@ export async function postRequest<T>(link: string, params?: object, headers?: ob
             }
         }
 
-        const response = await axios.post<T>(link, config);
+        let response = await axios.post<T>(link, config);
         logInfo("BaseRestService post", response);
         return response.data;
     } catch (ex) {

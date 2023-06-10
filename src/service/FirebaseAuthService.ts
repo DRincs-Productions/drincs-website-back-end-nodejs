@@ -10,7 +10,9 @@ import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace, getClientUrl } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
 
-function generateVerificationLink(email: string): string {
+const jwt = require('jsonwebtoken');
+
+async function generateVerificationLink(email: string): Promise<string> {
     try {
         return await getFirebaseAuth().generateEmailVerificationLink(email);
     }
@@ -19,13 +21,13 @@ function generateVerificationLink(email: string): string {
     }
 }
 
-function createAccount(user: UserRecordArgs): AuthData {
+async function createAccount(user: UserRecordArgs): Promise<AuthData> {
     try {
-        var userRecord = await getFirebaseAuth().createUser(user)
+        let userRecord = await getFirebaseAuth().createUser(user)
         if (!userRecord?.email || IsNullOrWhiteSpace(userRecord?.email)) {
             throw Error("Exception caught in FirebaseAuth CreateAccount: userRecord?.email is null")
         }
-        var verificationLink = generateVerificationLink(userRecord?.email);
+        let verificationLink: string = await generateVerificationLink(userRecord?.email);
     }
     catch (ex) {
         if (ex?.HResult == -2147024809) {
@@ -43,9 +45,9 @@ function createAccount(user: UserRecordArgs): AuthData {
     return new AuthData(userRecord)
 }
 
-function resetPassword(email: string) {
+async function resetPassword(email: string) {
     try {
-        var link = await getFirebaseAuth().generatePasswordResetLink(email);
+        let link = await getFirebaseAuth().generatePasswordResetLink(email);
     }
     catch (ex) {
         if (ex?.HResult == -2146233088) {
@@ -62,7 +64,7 @@ function resetPassword(email: string) {
     _emailService.SendResetPasswordMail(email, link);
 }
 
-function signInWithEmailPassword(loginModel: LoginAccount): AuthData {
+async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthData> {
     if (!loginModel.email || IsNullOrWhiteSpace(loginModel.email)) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync email is null")
     }
@@ -71,7 +73,7 @@ function signInWithEmailPassword(loginModel: LoginAccount): AuthData {
     }
     try {
         //log in an existing user
-        var userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
+        let userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
     }
     catch (ex) {
         if (ex?.HResult == -2146233088) {
@@ -80,23 +82,23 @@ function signInWithEmailPassword(loginModel: LoginAccount): AuthData {
         logError("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync: {0}", ex);
         throw Error("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync")
     }
-    if (userCredential == null) {
+    if (!userCredential) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Email or Password not Correct")
     }
-    var authData = await GetTokenByEmail(loginModel.email);
-    if (authData == null) {
+    let authData = await GetTokenByEmail(loginModel.email);
+    if (!authData) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Is Not Successful")
     }
     return authData
 }
 
 function GetSupportRole(userCredential: UserRecord): TypeAccount {
-    // TODO: var tokens = _firebaseDatabase.GetTokens(userCredential.Email);
+    // TODO: let tokens = _firebaseDatabase.GetTokens(userCredential.Email);
     // TODO: check discord roles
     return TypeAccount.Free;
 }
 
-function GetTokenByEmail(email?: string): AuthData | undefined {
+async function GetTokenByEmail(email?: string): Promise<AuthData | undefined> {
     let userRecord: UserRecord
     if (!email || IsNullOrWhiteSpace(email)) {
         throw Error("FirebaseAuth GetToken Error email IsNullOrWhiteSpace")
@@ -112,66 +114,37 @@ function GetTokenByEmail(email?: string): AuthData | undefined {
 }
 
 function GetToken(userCredential: UserRecord): AuthData | undefined {
-    var expirationTime = DateTime.Today.AddDays(10);
-    var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    let expirationTime = Math.floor(Date.now() / 1000) + ((60 * 60) * 24) // 1 day
+    let jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
-    var claims = new Dictionary<string, object>()
-    {
-        { ClaimTypes.Email, userCredential.Email },
-        { ClaimTypes.NameIdentifier, userCredential.DisplayName },
-        { ClaimTypes.PrimarySid, userCredential.Uid },
-        { ClaimTypes.Role, TypeAccount.Free },
-    };
-    if (jwtSecret == null) {
-        _logger.LogError("jwtSecret is null");
-        // TODO: throw new MyException("jwtSecret is null");
-        return null;
+    if (!jwtSecret) {
+        logError("jwtSecret is null");
+        throw Error("jwtSecret is null")
     }
 
-    try {
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Claims = claims,
-                Subject = new ClaimsIdentity(),
-                Issuer = _configuration.GetValue<string>("Jwt:FirebaseHost:ValidIssuer"),
-                IssuedAt = DateTime.Now,
-                Audience = _configuration.GetValue<string>("Jwt:FirebaseHost:ValidAudience"),
-                Expires = expirationTime,
-                // new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256Signature)
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtSecret)
-                    ),
-                    SecurityAlgorithms.HmacSha256Signature
-                ),
-                };
+    // TODO check role
+    let data = {
+        time: Date(),
+        userId: userCredential.uid,
+        email: userCredential.email,
+        nameIdentifier: userCredential.displayName,
+        role: TypeAccount.Free,
+    }
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
+    let token = jwt.sign({
+        exp: expirationTime,
+        data: data
+    }, jwtSecret);
 
-        return new AuthData(userCredential)
-        {
-            Token = token,
-                TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds(),
-        };
-    }
-    catch (MyException ex)
-    {
-        throw ex;
-    }
-    catch (ex) {
-        _logger.LogError("Exception caught in FirebaseAuth GetToken: {0}", ex);
-        // TODO: throw new MyException("uring the generation of Token");
-        return null;
-    }
+    return new AuthData(userCredential, expirationTime, token)
 }
 
-function oAuthDiscordCallback(code: string): string {
+async function oAuthDiscordCallback(code: string): Promise<string> {
     let clientUrlOAuthDiscord: string = getClientUrl()
 
-    var discordPrivateToken = await geTokenDiscord(code);
+    let discordPrivateToken = await geTokenDiscord(code);
 
-    var userInfo = await getUserInfoDiscord(discordPrivateToken);
+    let userInfo = await getUserInfoDiscord(discordPrivateToken);
 
     // * User must be verified
     if (!userInfo.verified) {
@@ -179,13 +152,13 @@ function oAuthDiscordCallback(code: string): string {
         throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
     }
 
-    var firebaseAuthData = GetTokenByEmail(userInfo.email);
+    let firebaseAuthData = GetTokenByEmail(userInfo.email);
 
     // * User is not registered
     // * Because in case A has a DRincs account, but does not have a Discord account
     // * B using A's email can create an unverified Discord account, and then login to the DRincs account
     if (!firebaseAuthData) {
-        var userRecorder = CreateAccount(userInfo);
+        let userRecorder = CreateAccount(userInfo);
         firebaseAuthData = GetTokenByEmail(userInfo.email);
 
         if (!firebaseAuthData) {

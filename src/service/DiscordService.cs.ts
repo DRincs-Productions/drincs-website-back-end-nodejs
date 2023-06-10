@@ -23,7 +23,7 @@ export async function geTokenDiscord(code: string): Promise<string> {
 
     let data = await postRequest<DiscordTokenRespons>("", body, headers)
 
-    if (data?.access_token == null) {
+    if (!data?.access_token) {
         throw new MyError("Exception caught in DiscordService GeToken", "DiscordService GeToken: response.Data?.access_token is null")
     }
     return data?.access_token
@@ -40,7 +40,7 @@ export async function getUserInfoDiscord(token: string): Promise<DiscordUserInfo
 
     let data = await getRequestWithHeaders<DiscordUserInfo>("", headers)
 
-    if (data == null) {
+    if (!data) {
         throw Error("DiscordService GetUserInfoAsync Data Is Null")
     }
 
