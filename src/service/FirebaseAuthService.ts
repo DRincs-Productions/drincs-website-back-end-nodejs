@@ -167,43 +167,32 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
 }
 
 function oAuthDiscordCallback(code: string): string {
-    try {
-        let clientUrlOAuthDiscord: string = _configuration.GetValue<string>("Url:Client")!;
+    let clientUrlOAuthDiscord: string = _configuration.GetValue<string>("Url:Client")!;
 
-        var discordPrivateToken = await geTokenDiscord(code);
+    var discordPrivateToken = await geTokenDiscord(code);
 
-        var userInfo = await getUserInfoDiscord(discordPrivateToken);
+    var userInfo = await getUserInfoDiscord(discordPrivateToken);
 
-        // * User must be verified
-        if (!userInfo.verified) {
-            logError("FirebaseAuth OAuthDiscordCallback: Discord account must be verified");
-            throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
+    // * User must be verified
+    if (!userInfo.verified) {
+        logError("FirebaseAuth OAuthDiscordCallback: Discord account must be verified");
+        throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
+    }
+
+    var firebaseAuthData = GetTokenByEmail(userInfo.email);
+
+    // * User is not registered
+    // * Because in case A has a DRincs account, but does not have a Discord account
+    // * B using A's email can create an unverified Discord account, and then login to the DRincs account
+    if (!firebaseAuthData) {
+        var userRecorder = CreateAccount(userInfo);
+        firebaseAuthData = GetTokenByEmail(userInfo.email);
+
+        if (!firebaseAuthData) {
+            logError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");
+            throw new MyError("There was an error when creating the account", "FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error")
         }
-
-        var firebaseAuthData = await GetTokenByEmail(userInfo.email);
-
-        // * User is not registered
-        // * Because in case A has a DRincs account, but does not have a Discord account
-        // * B using A's email can create an unverified Discord account, and then login to the DRincs account
-        if (firebaseAuthData == null) {
-            var userRecorder = await CreateAccount(userInfo);
-            firebaseAuthData = await GetTokenByEmail(userInfo.email);
-
-            if (firebaseAuthData == null) {
-                logError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");
-                throw new MyError("There was an error when creating the account", "FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error")
-            }
-        }
-
-        return new ServiceResponse<string>(clientUrlOAuthDiscord + firebaseAuthData.Token, isSuccesful: true);
     }
-    catch (MyException ex)
-    {
-        return new ServiceResponse<string>(messages: "FirebaseAuth OAuthDiscordCallback: " + ex.MessagesToShow, messagesToShow: ex.MessagesToShow, content: null, isSuccesful: false);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError("Exception caught in FirebaseAuth OAuthDiscordCallback: {0}", ex);
-        return new ServiceResponse<string>(messages: "Exception caught in FirebaseAuth OAuthDiscordCallback", content: null, isSuccesful: false);
-    }
+
+    return clientUrlOAuthDiscord + firebaseAuthData.token
 }
