@@ -28,16 +28,16 @@ function createAccount(user: UserRecordArgs): AuthData {
     }
     catch (ex) {
         if (ex?.HResult == -2147024809) {
-            return new ServiceResponse<AuthData>(messages: "FirebaseAuth CreateAccount: " + ex.Message, messagesToShow: ex.Message, content: null, isSuccesful: false);
+            throw new MyError(ex.message, "FirebaseAuth CreateAccount")
         }
         if (ex?.HResult == -2146233088) {
-            return new ServiceResponse<AuthData>(messages: "FirebaseAuth CreateAccount: The user with the provided email already exists", messagesToShow: "The user with the provided email already exists", content: null, isSuccesful: false);
+            throw new MyError("The user with the provided email already exists", "FirebaseAuth CreateAccount")
         }
         logError("Exception caught in FirebaseAuth CreateAccount: {0}", ex);
         throw Error("Exception caught in FirebaseAuth CreateAccount")
     }
 
-    _emailService.sendVerificationLinkMail(user.Email, user.DisplayName, verificationLink);
+    _emailService.sendVerificationLinkMail(user.email, user.displayName, verificationLink);
 
     return new AuthData(userRecord)
 }
@@ -48,7 +48,7 @@ function resetPassword(email: string) {
     }
     catch (ex) {
         if (ex?.HResult == -2146233088) {
-            return new ServiceResponse<string>(messages: "FirebaseAuth ResetPassword: The user with the provided email already exists", messagesToShow: "The user with the provided email already exists", content: null, isSuccesful: false);
+            throw new MyError("The user with the provided email already exists", "FirebaseAuth ResetPassword")
         }
         logError("Exception caught in FirebaseAuth ResetPassword: {0}", ex);
         throw Error("Exception caught in FirebaseAuth ResetPassword")
