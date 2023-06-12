@@ -1,12 +1,13 @@
 import { UserRecord } from "firebase-functions/v1/auth";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { generate } from "generate-password";
 import { sign } from "jsonwebtoken/index";
 import { TypeAccount } from "../enum/TypeAccountEnum";
 import { MyError } from "../models/MyError";
 import { AuthData } from "../models/auth/AuthData";
 import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
 import { LoginAccount } from "../models/auth/LoginAccount";
-import { UserRecordArgs, UserRecordArgsCreate } from "../models/firebase/UserRecordArgs";
+import { UserRecordArgsCreate } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace, getClientUrl } from "../utility/UtilityFunctionts";
@@ -18,7 +19,7 @@ async function createAccountNewAccountRecord(user: NewAccountRecord): Promise<Au
         user.Email,
         user.DisplayName,
         false,
-        user.PhotoUrl.IsNullOrEmpty() ? defaultUserIcon : user.PhotoUrl,
+        IsNullOrWhiteSpace(user.PhotoUrl) ? defaultUserIcon : user.PhotoUrl,
         false,
         user.Password
     )
@@ -32,7 +33,11 @@ async function createAccountDiscordUserInfo(user: DiscordUserInfo): Promise<Auth
         user.verified,
         "https://cdn.discordapp.com/avatars/" + user.id + "/" + user.avatar + ".png",
         false,
-        RandomString(40), // TODO questo dovrebbe essere cambiato
+        generate({
+            length: 60,
+            numbers: true,
+            symbols: true
+        })
     )
     return await createAccount(args);
 }
@@ -46,13 +51,14 @@ async function generateVerificationLink(email: string): Promise<string> {
     }
 }
 
-async function createAccount(user: UserRecordArgs): Promise<AuthData> {
+async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
+    let verificationLink: string | undefined
     try {
         let userRecord = await getFirebaseAuth().createUser(user)
         if (!userRecord?.email || IsNullOrWhiteSpace(userRecord?.email)) {
             throw Error("Exception caught in FirebaseAuth CreateAccount: userRecord?.email is null")
         }
-        let verificationLink: string = await generateVerificationLink(userRecord?.email);
+        verificationLink = await generateVerificationLink(userRecord?.email);
     }
     catch (ex) {
         if (ex?.HResult == -2147024809) {
@@ -71,8 +77,9 @@ async function createAccount(user: UserRecordArgs): Promise<AuthData> {
 }
 
 async function resetPassword(email: string) {
+    let link: string = ""
     try {
-        let link = await getFirebaseAuth().generatePasswordResetLink(email);
+        link = await getFirebaseAuth().generatePasswordResetLink(email);
     }
     catch (ex) {
         if (ex?.HResult == -2146233088) {
@@ -96,9 +103,10 @@ async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthDa
     if (!loginModel.password || IsNullOrWhiteSpace(loginModel.password)) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync password is null")
     }
+    let userCredential
     try {
         //log in an existing user
-        let userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
+        userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
     }
     catch (ex) {
         if (ex?.HResult == -2146233088) {
@@ -140,11 +148,10 @@ async function GetTokenByEmail(email?: string): Promise<AuthData | undefined> {
 
 function GetToken(userCredential: UserRecord): AuthData | undefined {
     let expirationTime = Math.floor(Date.now() / 1000) + ((60 * 60) * 24) // 1 day
-    let jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    let jwtSecret = process.env.JWT_SECRET_KEY
 
     if (!jwtSecret) {
-        logError("jwtSecret is null");
-        throw Error("jwtSecret is null")
+        throw Error("GetToken: jwtSecret is null")
     }
 
     // TODO check role
@@ -183,7 +190,7 @@ async function oAuthDiscordCallback(code: string): Promise<string> {
     // * Because in case A has a DRincs account, but does not have a Discord account
     // * B using A's email can create an unverified Discord account, and then login to the DRincs account
     if (!firebaseAuthData) {
-        let userRecorder = createAccountDiscordUserInfo(userInfo);
+        createAccountDiscordUserInfo(userInfo);
         firebaseAuthData = await GetTokenByEmail(userInfo.email);
 
         if (!firebaseAuthData) {
