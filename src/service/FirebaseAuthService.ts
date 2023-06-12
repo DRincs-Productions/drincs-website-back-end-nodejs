@@ -107,7 +107,7 @@ export async function resetPassword(email: string): Promise<boolean> {
     return true
 }
 
-export async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthData> {
+export async function signInWithEmailPassword(loginModel: LoginAccount, audienceHost?: string): Promise<AuthData> {
     if (!loginModel.email || IsNullOrWhiteSpace(loginModel.email)) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync email is null")
     }
@@ -130,7 +130,7 @@ export async function signInWithEmailPassword(loginModel: LoginAccount): Promise
     if (!userCredential) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Email or Password not Correct")
     }
-    let authData = await GetTokenByEmail(loginModel.email);
+    let authData = await GetTokenByEmail(loginModel.email, audienceHost);
     if (!authData) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Is Not Successful")
     }
@@ -143,7 +143,7 @@ function GetSupportRole(userCredential: UserRecord): TypeAccount {
     return TypeAccount.Free;
 }
 
-async function GetTokenByEmail(email?: string): Promise<AuthData | undefined> {
+async function GetTokenByEmail(email?: string, audienceHost?: string): Promise<AuthData | undefined> {
     let userRecord: UserRecord
     if (!email || IsNullOrWhiteSpace(email)) {
         throw Error("FirebaseAuth GetToken Error email IsNullOrWhiteSpace")
@@ -155,10 +155,10 @@ async function GetTokenByEmail(email?: string): Promise<AuthData | undefined> {
         logError("Exception caught in FirebaseAuth GetToken: {0}", ex);
         throw Error("Exception caught in FirebaseAuth GetToken");
     }
-    return GetToken(userRecord);
+    return GetToken(userRecord, audienceHost);
 }
 
-function GetToken(userCredential: UserRecord): AuthData | undefined {
+function GetToken(userCredential: UserRecord, audienceHost?: string): AuthData | undefined {
     let expirationTime = Math.floor(Date.now() / 1000) + ((60 * 60) * 24) // 1 day
     let jwtSecret = process.env.JWT_SECRET_KEY
 
@@ -170,7 +170,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
     let data = {
         issuer: getWebApiUrl(),
         issuedAt: Date(),
-        audience: getClientUrl(),   // TODO: I should get it from the application
+        audience: audienceHost,
         userId: userCredential.uid,
         email: userCredential.email,
         nameIdentifier: userCredential.displayName,
@@ -185,7 +185,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
     return new AuthData(userCredential, expirationTime, token)
 }
 
-export async function oAuthDiscordCallback(code: string): Promise<string> {
+export async function oAuthDiscordCallback(code: string, audienceHost?: string): Promise<string> {
     let clientUrlOAuthDiscord: string = getClientUrl()
 
     let discordPrivateToken = await geTokenDiscord(code);
@@ -198,14 +198,14 @@ export async function oAuthDiscordCallback(code: string): Promise<string> {
         throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
     }
 
-    let firebaseAuthData = await GetTokenByEmail(userInfo.email);
+    let firebaseAuthData = await GetTokenByEmail(userInfo.email, audienceHost);
 
     // * User is not registered
     // * Because in case A has a DRincs account, but does not have a Discord account
     // * B using A's email can create an unverified Discord account, and then login to the DRincs account
     if (!firebaseAuthData) {
         createAccountDiscordUserInfo(userInfo);
-        firebaseAuthData = await GetTokenByEmail(userInfo.email);
+        firebaseAuthData = await GetTokenByEmail(userInfo.email, audienceHost);
 
         if (!firebaseAuthData) {
             logError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");

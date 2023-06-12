@@ -28,7 +28,7 @@ export class AuthController extends ControllerInterface {
         app.post<string, any, HttpResponse<AuthData>, LoginAccount>(route + "/SignInWithEmailAndPassword", (req, res) => {
             logInfo("Start Auth SignInWithEmailAndPasswordAsync")
             try {
-                signInWithEmailPassword(req.body).then((value) => {
+                signInWithEmailPassword(req.body, req.headers.host).then((value) => {
                     res.send(generatedSuccesResult<AuthData>(value))
                 }).catch((e) => {
                     this.sendError(res, e)
@@ -59,7 +59,7 @@ export class AuthController extends ControllerInterface {
         app.get<string, any, HttpResponse<string>, any, { code: string }>(route + "/OAuthDiscordCallback", async (req, res) => {
             logInfo("Start Auth OAuthDiscordCallback");
             try {
-                let data = await oAuthDiscordCallback(req.query.code);
+                let data = await oAuthDiscordCallback(req.query.code, req.headers.host);
                 let clienturl: string = getClientUrl()
 
                 if (!data) {
