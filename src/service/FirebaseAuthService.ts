@@ -15,7 +15,7 @@ import { IsNullOrWhiteSpace, getClientUrl, getDefaultUserIcon } from "../utility
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
 import { sendResetPasswordMail, sendVerificationLinkMail } from "./MailService";
 
-async function createAccountNewAccountRecord(user: NewAccountRecord): Promise<AuthData> {
+export async function createAccountNewAccountRecord(user: NewAccountRecord): Promise<AuthData> {
     let args: UserRecordArgsCreate = new UserRecordArgsCreate(
         user.email,
         user.displayName,
