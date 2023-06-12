@@ -18,7 +18,7 @@ const firebaseApp = initializeApp(firebaseConfig())
 
 if (process.env.GCP_SERVICE_ACCOUNT) {
     admin.initializeApp({
-        credential: admin.credential.cert(process.env.GCP_SERVICE_ACCOUNT)
+        credential: admin.credential.cert(firebaseConfig())
     })
 }
 
