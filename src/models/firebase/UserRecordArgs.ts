@@ -10,7 +10,7 @@ export class UserRecordArgsCreate {   // CreateRequest
         emailVerified: boolean,
         photoUrl: string,
         disabled: boolean,
-        password: string,
+        password: string | undefined,
         phoneNumber?: string,
     ) {
         if (!email || IsNullOrWhiteSpace(email)) {
@@ -21,6 +21,9 @@ export class UserRecordArgsCreate {   // CreateRequest
         }
         if (!displayName || IsNullOrWhiteSpace(displayName)) {
             throw new MyError("Display Name is null or white space", "UserRecordArgsCreate")
+        }
+        if (!password || IsNullOrWhiteSpace(password)) {
+            throw new MyError("Password is null or white space", "UserRecordArgsCreate")
         }
         this.email = email
         this.phoneNumber = phoneNumber

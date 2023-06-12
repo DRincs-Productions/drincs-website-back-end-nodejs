@@ -7,21 +7,21 @@ import { MyError } from "../models/MyError";
 import { AuthData } from "../models/auth/AuthData";
 import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
 import { LoginAccount } from "../models/auth/LoginAccount";
+import { NewAccountRecord } from "../models/auth/NewAccountRecord";
 import { UserRecordArgsCreate } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
-import { IsNullOrWhiteSpace, getClientUrl } from "../utility/UtilityFunctionts";
+import { IsNullOrWhiteSpace, getClientUrl, getDefaultUserIcon } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
 
 async function createAccountNewAccountRecord(user: NewAccountRecord): Promise<AuthData> {
-    let defaultUserIcon: string = _configuration.GetValue<string>("Url:DefaultUserIcon")!;
     let args: UserRecordArgsCreate = new UserRecordArgsCreate(
-        user.Email,
-        user.DisplayName,
+        user.email,
+        user.displayName,
         false,
-        IsNullOrWhiteSpace(user.PhotoUrl) ? defaultUserIcon : user.PhotoUrl,
+        !user.photoUrl || IsNullOrWhiteSpace(user.photoUrl) ? getDefaultUserIcon() : user.photoUrl,
         false,
-        user.Password
+        user.password
     )
     return await createAccount(args);
 }
@@ -53,12 +53,9 @@ async function generateVerificationLink(email: string): Promise<string> {
 
 async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
     let verificationLink: string | undefined
+    let userRecord: UserRecord | undefined
     try {
-        let userRecord = await getFirebaseAuth().createUser(user)
-        if (!userRecord?.email || IsNullOrWhiteSpace(userRecord?.email)) {
-            throw Error("Exception caught in FirebaseAuth CreateAccount: userRecord?.email is null")
-        }
-        verificationLink = await generateVerificationLink(userRecord?.email);
+        userRecord = await getFirebaseAuth().createUser(user)
     }
     catch (ex) {
         if (ex?.HResult == -2147024809) {
@@ -69,6 +66,16 @@ async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
         }
         logError("Exception caught in FirebaseAuth CreateAccount: {0}", ex);
         throw Error("Exception caught in FirebaseAuth CreateAccount")
+    }
+    if (!userRecord?.email || IsNullOrWhiteSpace(userRecord?.email)) {
+        throw Error("Exception caught in FirebaseAuth CreateAccount: userRecord?.email is null")
+    }
+    try {
+        verificationLink = await generateVerificationLink(userRecord?.email);
+    }
+    catch (ex) {
+        logError("Exception caught in FirebaseAuth CreateAccount generateVerificationLink: {0}", ex);
+        throw Error("Exception caught in FirebaseAuth CreateAccount generateVerificationLink")
     }
 
     _emailService.sendVerificationLinkMail(user.email, user.displayName, verificationLink);

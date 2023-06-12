@@ -33,3 +33,7 @@ export function getClientUrl(): string {
         return "http://localhost:3005"
     }
 }
+
+export function getDefaultUserIcon(): string {
+    return "https://firebasestorage.googleapis.com/v0/b/drincs-website.appspot.com/o/public%2Ficon_user.png?alt=media"
+}
