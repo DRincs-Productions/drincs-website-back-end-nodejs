@@ -16,9 +16,11 @@ function firebaseConfig() {
 
 const firebaseApp = initializeApp(firebaseConfig())
 
-admin.initializeApp({
-    credential: admin.credential.cert("GCP_SERVICE_ACCOUNT")
-})
+if (process.env.GCP_SERVICE_ACCOUNT) {
+    admin.initializeApp({
+        credential: admin.credential.cert(process.env.GCP_SERVICE_ACCOUNT)
+    })
+}
 
 export function getFirebaseAnalytics() {
     // https://stackoverflow.com/questions/59400315/is-it-possible-to-setup-firebase-analytics-from-an-express-server
