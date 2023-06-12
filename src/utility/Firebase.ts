@@ -16,9 +16,10 @@ function firebaseConfig() {
 
 const firebaseApp = initializeApp(firebaseConfig())
 
-if (process.env.GCP_SERVICE_ACCOUNT) {
+// https://cloud.google.com/docs/authentication/application-default-credentials?hl=it#GAC
+if (process.env.WEBAPI_GOOGLE_APPLICATION_CREDENTIALS) {
     admin.initializeApp({
-        credential: admin.credential.cert(firebaseConfig())
+        credential: admin.credential.cert(process.env.WEBAPI_GOOGLE_APPLICATION_CREDENTIALS)
     })
 }
 
