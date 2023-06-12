@@ -170,7 +170,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
     let data = {
         issuer: getWebApiUrl(),
         issuedAt: Date(),
-        audience: getClientUrl(),
+        audience: getClientUrl(),   // TODO: I should get it from the application
         userId: userCredential.uid,
         email: userCredential.email,
         nameIdentifier: userCredential.displayName,
