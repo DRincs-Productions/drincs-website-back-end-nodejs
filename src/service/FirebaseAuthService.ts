@@ -58,12 +58,13 @@ async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
         userRecord = await getFirebaseAuth().createUser(user)
     }
     catch (ex) {
-        if (ex?.HResult == -2147024809) {
-            throw new MyError(ex.message, "FirebaseAuth CreateAccount")
-        }
-        if (ex?.HResult == -2146233088) {
-            throw new MyError("The user with the provided email already exists", "FirebaseAuth CreateAccount")
-        }
+        // TODO: Uncomment
+        // if (ex?.HResult == -2147024809) {
+        //     throw new MyError(ex.message, "FirebaseAuth CreateAccount")
+        // }
+        // if (ex?.HResult == -2146233088) {
+        //     throw new MyError("The user with the provided email already exists", "FirebaseAuth CreateAccount")
+        // }
         logError("Exception caught in FirebaseAuth CreateAccount: {0}", ex);
         throw Error("Exception caught in FirebaseAuth CreateAccount")
     }
@@ -89,9 +90,10 @@ async function resetPassword(email: string) {
         link = await getFirebaseAuth().generatePasswordResetLink(email);
     }
     catch (ex) {
-        if (ex?.HResult == -2146233088) {
-            throw new MyError("The user with the provided email already exists", "FirebaseAuth ResetPassword")
-        }
+        // TODO: Uncomment
+        // if (ex?.HResult == -2146233088) {
+        //     throw new MyError("The user with the provided email already exists", "FirebaseAuth ResetPassword")
+        // }
         logError("Exception caught in FirebaseAuth ResetPassword: {0}", ex);
         throw Error("Exception caught in FirebaseAuth ResetPassword")
     }
@@ -116,9 +118,10 @@ async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthDa
         userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
     }
     catch (ex) {
-        if (ex?.HResult == -2146233088) {
-            throw new MyError("Non-registered user or Wrong credentials", "FirebaseAuth SignInWithEmailAndPasswordAsync: Non-registered user")
-        }
+        // TODO: Uncomment
+        // if (ex?.HResult == -2146233088) {
+        //     throw new MyError("Non-registered user or Wrong credentials", "FirebaseAuth SignInWithEmailAndPasswordAsync: Non-registered user")
+        // }
         logError("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync: {0}", ex);
         throw Error("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync")
     }
