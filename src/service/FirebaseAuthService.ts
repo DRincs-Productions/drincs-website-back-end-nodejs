@@ -85,7 +85,7 @@ async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
     return new AuthData(userRecord)
 }
 
-async function resetPassword(email: string) {
+export async function resetPassword(email: string): Promise<boolean> {
     let link: string = ""
     try {
         link = await getFirebaseAuth().generatePasswordResetLink(email);
@@ -103,10 +103,11 @@ async function resetPassword(email: string) {
         throw Error("FirebaseAuth ResetPassword Is Not Successful " + email)
     }
 
-    await sendResetPasswordMail(email, link);
+    await sendResetPasswordMail(email, link)
+    return true
 }
 
-async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthData> {
+export async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthData> {
     if (!loginModel.email || IsNullOrWhiteSpace(loginModel.email)) {
         throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync email is null")
     }
@@ -182,7 +183,7 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
     return new AuthData(userCredential, expirationTime, token)
 }
 
-async function oAuthDiscordCallback(code: string): Promise<string> {
+export async function oAuthDiscordCallback(code: string): Promise<string> {
     let clientUrlOAuthDiscord: string = getClientUrl()
 
     let discordPrivateToken = await geTokenDiscord(code);
