@@ -11,7 +11,7 @@ import { NewAccountRecord } from "../models/auth/NewAccountRecord";
 import { UserRecordArgsCreate } from "../models/firebase/UserRecordArgs";
 import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
-import { IsNullOrWhiteSpace, getClientUrl, getDefaultUserIcon } from "../utility/UtilityFunctionts";
+import { IsNullOrWhiteSpace, getClientUrl, getDefaultUserIcon, getWebApiUrl } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
 import { sendResetPasswordMail, sendVerificationLinkMail } from "./MailService";
 
@@ -168,7 +168,9 @@ function GetToken(userCredential: UserRecord): AuthData | undefined {
 
     // TODO check role
     let data = {
-        time: Date(),
+        issuer: getWebApiUrl(),
+        issuedAt: Date(),
+        audience: getClientUrl(),
         userId: userCredential.uid,
         email: userCredential.email,
         nameIdentifier: userCredential.displayName,
