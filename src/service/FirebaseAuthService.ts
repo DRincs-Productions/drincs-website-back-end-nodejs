@@ -13,6 +13,7 @@ import { getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace, getClientUrl, getDefaultUserIcon } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
+import { sendResetPasswordMail, sendVerificationLinkMail } from "./MailService";
 
 async function createAccountNewAccountRecord(user: NewAccountRecord): Promise<AuthData> {
     let args: UserRecordArgsCreate = new UserRecordArgsCreate(
@@ -79,7 +80,7 @@ async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
         throw Error("Exception caught in FirebaseAuth CreateAccount generateVerificationLink")
     }
 
-    _emailService.sendVerificationLinkMail(user.email, user.displayName, verificationLink);
+    await sendVerificationLinkMail(user.email, user.displayName, verificationLink);
 
     return new AuthData(userRecord)
 }
@@ -102,7 +103,7 @@ async function resetPassword(email: string) {
         throw Error("FirebaseAuth ResetPassword Is Not Successful " + email)
     }
 
-    _emailService.SendResetPasswordMail(email, link);
+    await sendResetPasswordMail(email, link);
 }
 
 async function signInWithEmailPassword(loginModel: LoginAccount): Promise<AuthData> {
