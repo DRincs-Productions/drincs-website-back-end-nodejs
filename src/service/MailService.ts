@@ -32,7 +32,7 @@ Your DRincs Productions team`
 
 async function sendEmailSmtpClient(emailTo: string, subject: string, body: string) {
     try {
-        let gmailPassword = process.env.GMAIL_PASSWORD
+        let gmailPassword = process.env.NOREPLY_GMAIL_PASSWORD
 
         // create reusable transporter object using the default SMTP transport
         let transporter = createTransport({

@@ -48,6 +48,10 @@ jobs:
           echo -e "FIREBASE_WEBSITE_WEBAPI_APPID=${{ secrets.FIREBASE_WEBSITE_WEBAPI_APPID }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID=${{ secrets.FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "LOGTAIL_WEBAPI_KEY=${{ secrets.LOGTAIL_WEBAPI_KEY }}" >> .vercel/output/functions/out/app.js.func/.env
+          echo -e "API_KEY_DISCORD_CLIENT_ID=${{ secrets.API_KEY_DISCORD_CLIENT_ID }}" >> .vercel/output/functions/out/app.js.func/.env
+          echo -e "API_KEY_DISCORD_CLIENT_SECRET=${{ secrets.API_KEY_DISCORD_CLIENT_SECRET }}" >> .vercel/output/functions/out/app.js.func/.env
+          echo -e "NOREPLY_GMAIL_PASSWORD=${{ secrets.NOREPLY_GMAIL_PASSWORD }}" >> .vercel/output/functions/out/app.js.func/.env
+          echo -e "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .vercel/output/functions/out/app.js.func/.env
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
