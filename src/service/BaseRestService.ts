@@ -5,6 +5,17 @@ export async function getRequestWithHeaders<T>(link: string, headers: object): P
     return getRequest<T>(link, headers)
 }
 
+/**
+ * Check if the param has no possibility of causing a Server-side request forgery (SSRF)
+ * @param param 
+ */
+export function checkNotSSRF(param: string): boolean {
+    if (param.includes("http://") || param.includes("https://")) {
+        return false;
+    }
+    return true;
+}
+
 export async function getRequest<T>(link: string, headers?: object): Promise<T> {
     try {
         let config = {};

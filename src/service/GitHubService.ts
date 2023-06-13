@@ -3,17 +3,22 @@ import { GitHubRelease } from "../models/git/GitHubRelease";
 import { GitHubTranslationRelease } from "../models/git/GitHubTranslationRelease";
 import { GitRelease } from "../models/git/GitRelease";
 import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
-import { getRequestWithHeaders, postRequest } from "./BaseRestService";
+import { checkNotSSRF, getRequestWithHeaders, postRequest } from "./BaseRestService";
 
-const endpoint = "https://api.github.com/"
+const endpoint = "https://api.github.com"
 
 export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
-    let link: string = endpoint + "repos/" + repositoryName + "/releases";
-    let token = process.env.API_KEY_GITHUB
-
     if (IsNullOrWhiteSpace(repositoryName)) {
         throw Error("GitService GetReleases repositoryName Is Null Or Empty")
     }
+
+    repositoryName = "/" + repositoryName + "/"
+    if (!checkNotSSRF(repositoryName)) {
+        throw Error("GitService GetReleases repositoryName Is SSRF")
+    }
+
+    let link: string = endpoint + "/repos" + repositoryName + "releases";
+    let token = process.env.API_KEY_GITHUB
 
     if (IsNullOrWhiteSpace(token)) {
         throw Error("GitService GetReleases token Is Null Or Empty")
@@ -35,12 +40,17 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
 }
 
 export async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
-    let link: string = endpoint + "repos/" + repositoryName + "/issues";
-    let token = process.env.API_KEY_GITHUB
-
     if (IsNullOrWhiteSpace(repositoryName)) {
         throw Error("GitService CreateIssue repositoryName Is Null Or Empty")
     }
+
+    repositoryName = "/" + repositoryName + "/"
+    if (!checkNotSSRF(repositoryName)) {
+        throw Error("GitService CreateIssue repositoryName Is SSRF")
+    }
+
+    let link: string = endpoint + "/repos" + repositoryName + "issues";
+    let token = process.env.API_KEY_GITHUB
 
     if (IsNullOrWhiteSpace(token)) {
         throw Error("GitService CreateIssue token Is Null Or Empty")
