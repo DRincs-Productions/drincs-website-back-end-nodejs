@@ -1,3 +1,4 @@
+import { FirebaseError } from '@firebase/util';
 import { UserRecord } from "firebase-functions/v1/auth";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { generate } from "generate-password";
@@ -59,13 +60,12 @@ async function createAccount(user: UserRecordArgsCreate): Promise<AuthData> {
         userRecord = await getFirebaseAuth().createUser(user)
     }
     catch (ex) {
-        // TODO: Uncomment
-        // if (ex?.HResult == -2147024809) {
-        //     throw new MyError(ex.message, "FirebaseAuth CreateAccount")
-        // }
-        // if (ex?.HResult == -2146233088) {
-        //     throw new MyError("The user with the provided email already exists", "FirebaseAuth CreateAccount")
-        // }
+        if (ex instanceof FirebaseError && ex.code === "auth/invalid-password") {
+            throw new MyError(ex.message, "FirebaseAuth CreateAccount")
+        }
+        if (ex instanceof FirebaseError && ex.code === "auth/email-already-exists") {
+            throw new MyError("The user with the provided email already exists", "FirebaseAuth CreateAccount")
+        }
         logError("Exception caught in FirebaseAuth CreateAccount: {0}", ex);
         throw Error("Exception caught in FirebaseAuth CreateAccount")
     }
@@ -91,10 +91,9 @@ export async function resetPassword(email: string): Promise<boolean> {
         link = await getFirebaseAuth().generatePasswordResetLink(email);
     }
     catch (ex) {
-        // TODO: Uncomment
-        // if (ex?.HResult == -2146233088) {
-        //     throw new MyError("The user with the provided email already exists", "FirebaseAuth ResetPassword")
-        // }
+        if (ex instanceof FirebaseError && ex.code === "auth/email-not-found") {
+            throw new MyError("The user with the provided email already exists", "FirebaseAuth ResetPassword")
+        }
         logError("Exception caught in FirebaseAuth ResetPassword: {0}", ex);
         throw Error("Exception caught in FirebaseAuth ResetPassword")
     }
@@ -120,10 +119,9 @@ export async function signInWithEmailPassword(loginModel: LoginAccount, audience
         userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
     }
     catch (ex) {
-        // TODO: Uncomment
-        // if (ex?.HResult == -2146233088) {
-        //     throw new MyError("Non-registered user or Wrong credentials", "FirebaseAuth SignInWithEmailAndPasswordAsync: Non-registered user")
-        // }
+        if (ex instanceof FirebaseError && (ex.code === "auth/user-not-found" || ex.code === "auth/wrong-password")) {
+            throw new MyError("Non-registered user or Wrong credentials", "FirebaseAuth SignInWithEmailAndPasswordAsync")
+        }
         logError("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync: {0}", ex);
         throw Error("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync")
     }

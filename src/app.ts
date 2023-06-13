@@ -3,7 +3,8 @@ import express, { Express } from 'express';
 import { AuthController } from "./controllers/AuthController";
 import { GitHubController } from "./controllers/GitHubController";
 import { TranslationController } from "./controllers/TranslationController";
-import { logInfo, logTest } from "./utility/Logger";
+import { initializeFirebaseApp } from "./utility/Firebase";
+import { logError, logInfo, logTest } from "./utility/Logger";
 
 // env
 let dotenv = require('dotenv');
@@ -18,6 +19,13 @@ const app: Express = express();
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+
+try {
+    initializeFirebaseApp()
+}
+catch (ex) {
+    logError("initializeFirebaseApp", ex)
+}
 
 // add routes
 new TranslationController(app, "/api/translation")
