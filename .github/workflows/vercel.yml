@@ -47,7 +47,8 @@ jobs:
           echo -e "FIREBASE_WEBSITE_WEBAPI_MESSAGINGSENDERID=${{ secrets.FIREBASE_WEBSITE_WEBAPI_MESSAGINGSENDERID }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "FIREBASE_WEBSITE_WEBAPI_APPID=${{ secrets.FIREBASE_WEBSITE_WEBAPI_APPID }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID=${{ secrets.FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID }}" >> .vercel/output/functions/out/app.js.func/.env
-          echo -e "WEBAPI_GOOGLE_APPLICATION_CREDENTIALS=${{ secrets.WEBAPI_GOOGLE_APPLICATION_CREDENTIALS }}" >> .vercel/output/functions/out/app.js.func/.env
+          echo -e "FIREBASE_WEBSITE_WEBAPI_CREDENTIALS_PRIVATEKEY=${{ secrets.FIREBASE_WEBSITE_WEBAPI_CREDENTIALS_PRIVATEKEY }}" >> .vercel/output/functions/out/app.js.func/.env
+          echo -e "FIREBASE_WEBSITE_WEBAPI_CREDENTIALS_CLIENTEMAIL=${{ secrets.FIREBASE_WEBSITE_WEBAPI_CREDENTIALS_CLIENTEMAIL }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "LOGTAIL_WEBAPI_KEY=${{ secrets.LOGTAIL_WEBAPI_KEY }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "API_KEY_DISCORD_CLIENT_ID=${{ secrets.API_KEY_DISCORD_CLIENT_ID }}" >> .vercel/output/functions/out/app.js.func/.env
           echo -e "API_KEY_DISCORD_CLIENT_SECRET=${{ secrets.API_KEY_DISCORD_CLIENT_SECRET }}" >> .vercel/output/functions/out/app.js.func/.env
