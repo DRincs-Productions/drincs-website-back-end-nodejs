@@ -6,7 +6,7 @@ import { IsNullOrWhiteSpace, onlyLettersAndNumbers } from "../utility/UtilityFun
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
 const endpoint = "https://api.github.com"
-const permitted_users: string[] = []
+const permitted_users: string[] = ["DRincs-Productions", "DonRP"]
 
 function checkRepositoryName(repositoryName: string): boolean {
     if (IsNullOrWhiteSpace(repositoryName)) {
