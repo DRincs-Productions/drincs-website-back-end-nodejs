@@ -1,7 +1,7 @@
 import { CrowdinLanguages, CrowdinLanguagesData } from "../models/translation/CrowdinLanguages";
 import { CrowdinProjectInfo } from "../models/translation/CrowdinProjectInfo";
-import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
-import { checkNotSSRF, getRequestWithHeaders } from "./BaseRestService";
+import { IsNullOrWhiteSpace, onlyLettersAndNumbers } from "../utility/UtilityFunctionts";
+import { getRequestWithHeaders } from "./BaseRestService";
 
 const endpoint: string = "https://api.crowdin.com/api/v2"
 
@@ -10,12 +10,11 @@ export async function getProject(projectId: string): Promise<CrowdinProjectInfo>
         throw Error("CrowdinService GetProject repositoryName Is Null Or Empty")
     }
 
-    projectId = "/" + projectId
-    if (!checkNotSSRF(projectId)) {
-        throw Error("CrowdinService GetProject repositoryName Is SSRF")
+    if (!onlyLettersAndNumbers(projectId)) {
+        throw Error("CrowdinService GetProject repositoryName Is SSRF:" + projectId)
     }
 
-    let link: string = endpoint + "/projects" + projectId;
+    let link: string = endpoint + "/projects/" + projectId;
     let token = process.env.API_KEY_CROWDIN
 
     if (IsNullOrWhiteSpace(token)) {
@@ -39,12 +38,11 @@ export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLangu
         throw Error("CrowdinService GetLanguages repositoryName Is Null Or Empty")
     }
 
-    projectId = "/" + projectId + "/"
-    if (!checkNotSSRF(projectId)) {
-        throw Error("CrowdinService GetLanguages repositoryName Is SSRF")
+    if (!onlyLettersAndNumbers(projectId)) {
+        throw Error("CrowdinService GetLanguages repositoryName Is SSRF:" + projectId)
     }
 
-    let link: string = endpoint + "/projects" + projectId + "languages/progress";
+    let link: string = endpoint + "/projects/" + projectId + "/languages/progress";
     let token = process.env.API_KEY_CROWDIN
 
     if (IsNullOrWhiteSpace(token)) {

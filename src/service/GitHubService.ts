@@ -2,22 +2,37 @@ import { GitHubCreateIssueBody } from "../models/git/GitHubCreateIssueBody";
 import { GitHubRelease } from "../models/git/GitHubRelease";
 import { GitHubTranslationRelease } from "../models/git/GitHubTranslationRelease";
 import { GitRelease } from "../models/git/GitRelease";
-import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
-import { checkNotSSRF, getRequestWithHeaders, postRequest } from "./BaseRestService";
+import { IsNullOrWhiteSpace, onlyLettersAndNumbers } from "../utility/UtilityFunctionts";
+import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
 const endpoint = "https://api.github.com"
+const permitted_users: string[] = []
 
-export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
+function checkRepositoryName(repositoryName: string): boolean {
     if (IsNullOrWhiteSpace(repositoryName)) {
         throw Error("GitService GetReleases repositoryName Is Null Or Empty")
     }
 
-    repositoryName = "/" + repositoryName + "/"
-    if (!checkNotSSRF(repositoryName)) {
-        throw Error("GitService GetReleases repositoryName Is SSRF")
+    let array = repositoryName.split('/')
+    if (array.length != 2) {
+        throw Error("GitService GetReleases repositoryName not uguale to User/Repository: " + repositoryName)
+    }
+    if (!permitted_users.includes(array[0])) {
+        throw Error("GitService GetReleases repositoryName not permitted: " + repositoryName)
+    }
+    if (!onlyLettersAndNumbers(array[1])) {
+        throw Error("GitService GetReleases repositoryName Is SSRF:" + repositoryName)
     }
 
-    let link: string = endpoint + "/repos" + repositoryName + "releases";
+    return true
+}
+
+export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
+    if (!checkRepositoryName(repositoryName)) {
+        throw Error("GitService GetReleases repositoryName Error")
+    }
+
+    let link: string = endpoint + "/repos/" + repositoryName + "/releases";
     let token = process.env.API_KEY_GITHUB
 
     if (IsNullOrWhiteSpace(token)) {
@@ -40,16 +55,11 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
 }
 
 export async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
-    if (IsNullOrWhiteSpace(repositoryName)) {
-        throw Error("GitService CreateIssue repositoryName Is Null Or Empty")
+    if (!checkRepositoryName(repositoryName)) {
+        throw Error("GitService GetReleases repositoryName Error")
     }
 
-    repositoryName = "/" + repositoryName + "/"
-    if (!checkNotSSRF(repositoryName)) {
-        throw Error("GitService CreateIssue repositoryName Is SSRF")
-    }
-
-    let link: string = endpoint + "/repos" + repositoryName + "issues";
+    let link: string = endpoint + "/repos/" + repositoryName + "/issues";
     let token = process.env.API_KEY_GITHUB
 
     if (IsNullOrWhiteSpace(token)) {

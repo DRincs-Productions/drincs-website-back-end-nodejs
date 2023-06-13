@@ -46,3 +46,7 @@ export function getOAuthDiscordCallback(): string {
         return "https://discord.com/api/oauth2/authorize?client_id=955048685056692307&redirect_uri=https%3A%2F%2Flocalhost%3A7127%2Fauth%2FOAuthDiscordCallback&response_type=code&scope=identify%20email"
     }
 }
+
+export function onlyLettersAndNumbers(str: string) {
+    return /^[A-Za-z0-9]*$/.test(str);
+}

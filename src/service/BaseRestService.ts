@@ -5,35 +5,7 @@ export async function getRequestWithHeaders<T>(link: string, headers: object): P
     return getRequest<T>(link, headers)
 }
 
-/**
- * Check if the param has no possibility of causing a Server-side request forgery (SSRF)
- * @param param 
- */
-export function checkNotSSRF(param: string): boolean {
-    if (param.includes("http://") || param.includes("https://")) {
-        return false;
-    }
-    return true;
-}
-
-/**
- * Get the number of http or https in the url
- * @param url 
- * @returns the number of http or https in the url
- */
-function getNumbeeOfUrl(url: string): number {
-    let http = url.match(/http/g);
-    let https = url.match(/https/g);
-    let httpNumber = http ? http.length : 0;
-    let httpsNumber = https ? https.length : 0;
-    return httpNumber + httpsNumber;
-}
-
 export async function getRequest<T>(link: string, headers?: object): Promise<T> {
-    if (getNumbeeOfUrl(link) > 1) {
-        throw Error("BaseRestService get link Is SSRF")
-    }
-
     try {
         let config = {};
 
@@ -62,10 +34,6 @@ export async function postRequestWithParams<T>(link: string, params: object): Pr
 }
 
 export async function postRequest<T>(link: string, params?: object, headers?: object): Promise<T> {
-    if (getNumbeeOfUrl(link) > 1) {
-        throw Error("BaseRestService get link Is SSRF")
-    }
-
     try {
         let config = {};
 
