@@ -1,19 +1,19 @@
 import { TranslationResult, TranslationResultItem } from "../models/translation/TranslationResult";
 import { logInfo } from "../utility/Logger";
-import { GetLanguagesAsync as getLanguages, getProject } from "./CrowdinService";
+import { getLanguages, getProject } from "./CrowdinService";
 import { getTranslationRelease } from "./GitHubService";
 
 export async function getTranslations(repositoryName: string, crowdinProjectId: string): Promise<TranslationResult> {
     logInfo("Start Translation GetTranslationsAsync")
-    var releases = await getTranslationRelease(repositoryName)
-    var projectInfo = await getProject(crowdinProjectId)
-    var languages = await getLanguages(crowdinProjectId)
+    let releases = await getTranslationRelease(repositoryName)
+    let projectInfo = await getProject(crowdinProjectId)
+    let languages = await getLanguages(crowdinProjectId)
 
-    var resultArray: TranslationResultItem[] = []
-    var index = 0;
+    let resultArray: TranslationResultItem[] = []
+    let index = 0;
 
     languages.forEach((item) => {
-        var translationResultItem = new TranslationResultItem();
+        let translationResultItem = new TranslationResultItem();
         translationResultItem.id = index;
         translationResultItem.translated = item?.data?.phrases != null ? (item.data.phrases.translated * 100) / item.data.phrases.total : 0;
         translationResultItem.approved = item?.data?.phrases != null ? (item.data.phrases.approved * 100) / item.data.phrases.total : 0;
@@ -45,7 +45,7 @@ export async function getTranslations(repositoryName: string, crowdinProjectId: 
         index++;
     })
 
-    var result = new TranslationResult();
+    let result = new TranslationResult();
     result.list = resultArray;
     result.name = projectInfo?.data?.name;
     result.logo = projectInfo?.data?.logo;

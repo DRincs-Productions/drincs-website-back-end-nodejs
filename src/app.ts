@@ -1,8 +1,11 @@
 import bodyParser from "body-parser";
 import express, { Express } from 'express';
+import rateLimit from 'express-rate-limit';
+import { AuthController } from "./controllers/AuthController";
 import { GitHubController } from "./controllers/GitHubController";
 import { TranslationController } from "./controllers/TranslationController";
-import { logInfo, logTest } from "./utility/Logger";
+import { initializeFirebaseApp } from "./utility/Firebase";
+import { logError, logInfo, logTest } from "./utility/Logger";
 
 // env
 let dotenv = require('dotenv');
@@ -18,9 +21,27 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
+// add limit
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 500, // Limit each IP to 500 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+// Apply the rate limiting middleware to all requests
+app.use(limiter)
+
+try {
+    initializeFirebaseApp()
+}
+catch (ex) {
+    logError("initializeFirebaseApp", ex)
+}
+
 // add routes
 new TranslationController(app, "/api/translation")
 new GitHubController(app, "/api/github")
+new AuthController(app, "/api/auth")
 
 app.get("/api", (req, res) => {
     logInfo("Home")

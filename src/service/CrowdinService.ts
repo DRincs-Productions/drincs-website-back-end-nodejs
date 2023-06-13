@@ -1,19 +1,31 @@
 import { CrowdinLanguages, CrowdinLanguagesData } from "../models/translation/CrowdinLanguages";
 import { CrowdinProjectInfo } from "../models/translation/CrowdinProjectInfo";
-import { isNullOrEmpty } from "../utility/UtilityFunctionts";
+import { IsNullOrWhiteSpace, onlyLettersAndNumbers } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders } from "./BaseRestService";
 
-let endpoint: string = "https://api.crowdin.com/api/v2/"
+const endpoint: string = "https://api.crowdin.com/api/v2"
 
-export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
-    let link: string = endpoint + "projects/" + projectId;
-    let token = process.env.API_KEY_CROWDIN
-
-    if (isNullOrEmpty(projectId)) {
-        throw Error("CrowdinService GetProject repositoryName Is Null Or Empty")
+function checkProjectId(projectId: string): boolean {
+    if (IsNullOrWhiteSpace(projectId)) {
+        throw Error("CrowdinService GetProject projectId Is Null Or Empty")
     }
 
-    if (isNullOrEmpty(token)) {
+    if (!onlyLettersAndNumbers(projectId)) {
+        throw Error("CrowdinService GetProject projectId Is SSRF:" + projectId)
+    }
+
+    return true
+}
+
+export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
+    if (!checkProjectId(projectId)) {
+        throw Error("CrowdinService GetProject projectId Error")
+    }
+
+    let link: string = endpoint + "/projects/" + projectId;
+    let token = process.env.API_KEY_CROWDIN
+
+    if (IsNullOrWhiteSpace(token)) {
         throw Error("CrowdinService GetProject token Is Null Or Empty")
     }
 
@@ -29,16 +41,16 @@ export async function getProject(projectId: string): Promise<CrowdinProjectInfo>
     return data
 }
 
-export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLanguagesData[]> {
-    let link: string = endpoint + "projects/" + projectId + "/languages/progress";
-    let token = process.env.API_KEY_CROWDIN
-
-    if (isNullOrEmpty(projectId)) {
-        throw Error("CrowdinService GetLanguages repositoryName Is Null Or Empty")
+export async function getLanguages(projectId: string): Promise<CrowdinLanguagesData[]> {
+    if (!checkProjectId(projectId)) {
+        throw Error("CrowdinService getLanguages projectId Error")
     }
 
-    if (isNullOrEmpty(token)) {
-        throw Error("CrowdinService GetLanguages token Is Null Or Empty")
+    let link: string = endpoint + "/projects/" + projectId + "/languages/progress";
+    let token = process.env.API_KEY_CROWDIN
+
+    if (IsNullOrWhiteSpace(token)) {
+        throw Error("CrowdinService getLanguages token Is Null Or Empty")
     }
 
     let headers = {
@@ -48,7 +60,7 @@ export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLangu
     let data = await getRequestWithHeaders<CrowdinLanguages>(link, headers)
 
     if (!data || !data.data) {
-        throw Error("CrowdinService GetLanguages Data Is Null")
+        throw Error("CrowdinService getLanguages Data Is Null")
     }
     return data.data
 }

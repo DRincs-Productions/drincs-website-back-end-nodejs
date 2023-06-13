@@ -2,20 +2,40 @@ import { GitHubCreateIssueBody } from "../models/git/GitHubCreateIssueBody";
 import { GitHubRelease } from "../models/git/GitHubRelease";
 import { GitHubTranslationRelease } from "../models/git/GitHubTranslationRelease";
 import { GitRelease } from "../models/git/GitRelease";
-import { isNullOrEmpty } from "../utility/UtilityFunctionts";
+import { IsNullOrWhiteSpace, onlyLettersAndNumbers } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
-const endpoint = "https://api.github.com/"
+const endpoint = "https://api.github.com"
+const permitted_users: string[] = []
 
-export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
-    let link: string = endpoint + "repos/" + repositoryName + "/releases";
-    let token = process.env.API_KEY_GITHUB
-
-    if (isNullOrEmpty(repositoryName)) {
+function checkRepositoryName(repositoryName: string): boolean {
+    if (IsNullOrWhiteSpace(repositoryName)) {
         throw Error("GitService GetReleases repositoryName Is Null Or Empty")
     }
 
-    if (isNullOrEmpty(token)) {
+    let array = repositoryName.split('/')
+    if (array.length != 2) {
+        throw Error("GitService GetReleases repositoryName not uguale to User/Repository: " + repositoryName)
+    }
+    if (!permitted_users.includes(array[0])) {
+        throw Error("GitService GetReleases repositoryName not permitted: " + repositoryName)
+    }
+    if (!onlyLettersAndNumbers(array[1])) {
+        throw Error("GitService GetReleases repositoryName Is SSRF:" + repositoryName)
+    }
+
+    return true
+}
+
+export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
+    if (!checkRepositoryName(repositoryName)) {
+        throw Error("GitService getReleases repositoryName Error")
+    }
+
+    let link: string = endpoint + "/repos/" + repositoryName + "/releases";
+    let token = process.env.API_KEY_GITHUB
+
+    if (IsNullOrWhiteSpace(token)) {
         throw Error("GitService GetReleases token Is Null Or Empty")
     }
     let headers = {
@@ -27,7 +47,7 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
         throw Error("GitService GetReleases Data Is Null")
     }
 
-    var resArray: GitRelease[] = [];
+    let resArray: GitRelease[] = [];
     data.forEach((item) => {
         resArray.push(new GitRelease(item));
     })
@@ -35,14 +55,14 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
 }
 
 export async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
-    let link: string = endpoint + "repos/" + repositoryName + "/issues";
-    let token = process.env.API_KEY_GITHUB
-
-    if (isNullOrEmpty(repositoryName)) {
-        throw Error("GitService CreateIssue repositoryName Is Null Or Empty")
+    if (!checkRepositoryName(repositoryName)) {
+        throw Error("GitService createIssue repositoryName Error")
     }
 
-    if (isNullOrEmpty(token)) {
+    let link: string = endpoint + "/repos/" + repositoryName + "/issues";
+    let token = process.env.API_KEY_GITHUB
+
+    if (IsNullOrWhiteSpace(token)) {
         throw Error("GitService CreateIssue token Is Null Or Empty")
     }
 
@@ -55,13 +75,13 @@ export async function createIssue(repositoryName: string, issue: GitHubCreateIss
 }
 
 export async function getTranslationRelease(repositoryName: string): Promise<GitHubTranslationRelease[]> {
-    var releases = await getReleases(repositoryName);
-    if (releases == null) {
-        throw Error("GetTranslationReleaseAsync GetReleasesAsync Error")
+    let releases = await getReleases(repositoryName);
+    if (!releases) {
+        throw Error("getTranslationRelease GetReleasesAsync Error")
     }
 
-    var result: GitHubTranslationRelease[] = releases.map((item) => {
-        var b = new GitHubTranslationRelease();
+    let result: GitHubTranslationRelease[] = releases.map((item) => {
+        let b = new GitHubTranslationRelease();
         b.version = item.tagName?.split('/')[1];
         b.language = item.tagName?.split('/')[0];
         b.downloadUrl = item.assets && (item.assets?.length || 0) > 0 ? item.assets[0].browser_download_url : ""
