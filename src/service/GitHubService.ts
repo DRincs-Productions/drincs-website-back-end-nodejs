@@ -29,7 +29,7 @@ function checkRepositoryName(repositoryName: string): boolean {
 
 export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
     if (!checkRepositoryName(repositoryName)) {
-        throw Error("GitService GetReleases repositoryName Error")
+        throw Error("GitService getReleases repositoryName Error")
     }
 
     let link: string = endpoint + "/repos/" + repositoryName + "/releases";
@@ -56,7 +56,7 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
 
 export async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
     if (!checkRepositoryName(repositoryName)) {
-        throw Error("GitService GetReleases repositoryName Error")
+        throw Error("GitService createIssue repositoryName Error")
     }
 
     let link: string = endpoint + "/repos/" + repositoryName + "/issues";
@@ -77,7 +77,7 @@ export async function createIssue(repositoryName: string, issue: GitHubCreateIss
 export async function getTranslationRelease(repositoryName: string): Promise<GitHubTranslationRelease[]> {
     let releases = await getReleases(repositoryName);
     if (!releases) {
-        throw Error("GetTranslationReleaseAsync GetReleasesAsync Error")
+        throw Error("getTranslationRelease GetReleasesAsync Error")
     }
 
     let result: GitHubTranslationRelease[] = releases.map((item) => {

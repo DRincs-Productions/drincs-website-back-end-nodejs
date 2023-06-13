@@ -5,13 +5,21 @@ import { getRequestWithHeaders } from "./BaseRestService";
 
 const endpoint: string = "https://api.crowdin.com/api/v2"
 
-export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
+function checkProjectId(projectId: string): boolean {
     if (IsNullOrWhiteSpace(projectId)) {
-        throw Error("CrowdinService GetProject repositoryName Is Null Or Empty")
+        throw Error("CrowdinService GetProject projectId Is Null Or Empty")
     }
 
     if (!onlyLettersAndNumbers(projectId)) {
-        throw Error("CrowdinService GetProject repositoryName Is SSRF:" + projectId)
+        throw Error("CrowdinService GetProject projectId Is SSRF:" + projectId)
+    }
+
+    return true
+}
+
+export async function getProject(projectId: string): Promise<CrowdinProjectInfo> {
+    if (!checkProjectId(projectId)) {
+        throw Error("CrowdinService GetProject projectId Error")
     }
 
     let link: string = endpoint + "/projects/" + projectId;
@@ -33,20 +41,16 @@ export async function getProject(projectId: string): Promise<CrowdinProjectInfo>
     return data
 }
 
-export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLanguagesData[]> {
-    if (IsNullOrWhiteSpace(projectId)) {
-        throw Error("CrowdinService GetLanguages repositoryName Is Null Or Empty")
-    }
-
-    if (!onlyLettersAndNumbers(projectId)) {
-        throw Error("CrowdinService GetLanguages repositoryName Is SSRF:" + projectId)
+export async function getLanguages(projectId: string): Promise<CrowdinLanguagesData[]> {
+    if (!checkProjectId(projectId)) {
+        throw Error("CrowdinService getLanguages projectId Error")
     }
 
     let link: string = endpoint + "/projects/" + projectId + "/languages/progress";
     let token = process.env.API_KEY_CROWDIN
 
     if (IsNullOrWhiteSpace(token)) {
-        throw Error("CrowdinService GetLanguages token Is Null Or Empty")
+        throw Error("CrowdinService getLanguages token Is Null Or Empty")
     }
 
     let headers = {
@@ -56,7 +60,7 @@ export async function GetLanguagesAsync(projectId: string): Promise<CrowdinLangu
     let data = await getRequestWithHeaders<CrowdinLanguages>(link, headers)
 
     if (!data || !data.data) {
-        throw Error("CrowdinService GetLanguages Data Is Null")
+        throw Error("CrowdinService getLanguages Data Is Null")
     }
     return data.data
 }

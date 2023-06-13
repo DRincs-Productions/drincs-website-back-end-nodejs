@@ -1,6 +1,6 @@
 import { TranslationResult, TranslationResultItem } from "../models/translation/TranslationResult";
 import { logInfo } from "../utility/Logger";
-import { GetLanguagesAsync as getLanguages, getProject } from "./CrowdinService";
+import { getLanguages, getProject } from "./CrowdinService";
 import { getTranslationRelease } from "./GitHubService";
 
 export async function getTranslations(repositoryName: string, crowdinProjectId: string): Promise<TranslationResult> {
