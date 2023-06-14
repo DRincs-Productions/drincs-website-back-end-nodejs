@@ -7,7 +7,7 @@ export class TesterController extends ControllerInterface {
     constructor(app: Express, route: string) {
         super(app, route)
 
-        app.get(route + "/awakens", (req, res) => {
+        app.get(route + "/logger", (req, res) => {
             res.send(logTest())
         })
 
