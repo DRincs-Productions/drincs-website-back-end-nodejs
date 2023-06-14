@@ -1,4 +1,5 @@
 import { Express } from 'express';
+import { ProjectsEnum, getTranslationValuesByEnum } from '../enum/ProjectsEnum';
 import { HttpResponse, generatedSuccesResult } from '../models/HttpResponse';
 import { TranslationResult } from '../models/translation/TranslationResult';
 import { getTranslations } from '../service/TranslationService';
@@ -9,10 +10,12 @@ export class TranslationController extends ControllerInterface {
     constructor(app: Express, route: string) {
         super(app, route)
 
-        app.get<string, any, HttpResponse<TranslationResult>, any, { repositoryName: string, crowdinProjectId: string }>(route + "/GetTranslations", (req, res) => {
+        app.get<string, any, HttpResponse<TranslationResult>, any, { projectId: ProjectsEnum }>(route + "/GetTranslations", (req, res) => {
             logInfo("Start Translation GetTranslations")
             try {
-                getTranslations(req.query.repositoryName, req.query.crowdinProjectId).then((value) => {
+                let repositoryName = getTranslationValuesByEnum(req.query.projectId).github
+                let crowdinProjectId = getTranslationValuesByEnum(req.query.projectId).crowdin
+                getTranslations(repositoryName, crowdinProjectId).then((value) => {
                     res.send(generatedSuccesResult<TranslationResult>(value))
                 }).catch((e) => {
                     this.sendError(res, e)
