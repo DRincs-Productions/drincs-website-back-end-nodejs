@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logError, logInfo } from '../utility/Logger';
+import { logError } from '../utility/Logger';
 
 export async function getRequestWithHeaders<T>(link: string, headers: object): Promise<T> {
     return getRequest<T>(link, headers)
@@ -17,7 +17,6 @@ export async function getRequest<T>(link: string, headers?: object): Promise<T> 
         }
 
         let response = await axios.get<T>(link, config);
-        logInfo("BaseRestService get", response);
         return response.data;
     } catch (ex) {
         logError("BaseRestService get error", ex)
@@ -58,7 +57,6 @@ export async function postRequest<T>(link: string, params?: object, headers?: ob
         }
 
         let response = await axios.post<T>(link, config);
-        logInfo("BaseRestService post", response);
         return response.data;
     } catch (ex) {
         logError("BaseRestService post error", ex)
