@@ -1,6 +1,9 @@
 import { Logtail } from "@logtail/node";
 
 export function logInfo(message: string, body: any = "") {
+    if (process.env.IS_VERCEL) {
+        message = "vercel: " + message
+    }
     if (process.env.NODE_ENV === 'production') {
         try {
             let logtail = new Logtail(process.env.LOGTAIL_WEBAPI_KEY || "");
@@ -13,6 +16,9 @@ export function logInfo(message: string, body: any = "") {
 
 
 export function logWarn(message: string, body: any = "") {
+    if (process.env.IS_VERCEL) {
+        message = "vercel: " + message
+    }
     if (process.env.NODE_ENV === 'production') {
         try {
             let logtail = new Logtail(process.env.LOGTAIL_WEBAPI_KEY || "");
@@ -24,6 +30,9 @@ export function logWarn(message: string, body: any = "") {
 }
 
 export function logError(message: string, body: any = "") {
+    if (process.env.IS_VERCEL) {
+        message = "vercel: " + message
+    }
     if (process.env.NODE_ENV === 'production') {
         try {
             let logtail = new Logtail(process.env.LOGTAIL_WEBAPI_KEY || "");
