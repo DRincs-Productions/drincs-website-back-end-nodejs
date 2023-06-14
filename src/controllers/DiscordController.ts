@@ -10,8 +10,11 @@ export class DiscordController extends ControllerInterface {
         app.get(route + "/awakens", (req, res) => {
             logInfo("Start Discord awakens")
             try {
-                awakensDiscord()
-                res.send("🤖 This is a harsh awakening")
+                awakensDiscord().then(() => {
+                    res.send("🤖 This is a harsh awakening")
+                }).catch((e) => {
+                    this.sendError(res, e)
+                })
             } catch (e) {
                 this.sendError(res, e)
             }
