@@ -1,6 +1,6 @@
 import { FirebaseError } from '@firebase/util';
 import { UserRecord } from "firebase-functions/v1/auth";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { generate } from "generate-password";
 import { sign } from "jsonwebtoken/index";
 import { TypeAccount } from "../enum/TypeAccountEnum";
@@ -10,7 +10,7 @@ import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
 import { LoginAccount } from "../models/auth/LoginAccount";
 import { NewAccountRecord } from "../models/auth/NewAccountRecord";
 import { UserRecordArgsCreate } from "../models/firebase/UserRecordArgs";
-import { getFirebaseAuth } from "../utility/Firebase";
+import { getAuthFirebase, getFirebaseAuth } from "../utility/Firebase";
 import { logError } from "../utility/Logger";
 import { IsNullOrWhiteSpace, getClientUrl, getDefaultUserIcon, getWebApiUrl } from "../utility/UtilityFunctionts";
 import { geTokenDiscord, getUserInfoDiscord } from "./DiscordService.cs";
@@ -116,7 +116,7 @@ export async function signInWithEmailPassword(loginModel: LoginAccount, audience
     let userCredential
     try {
         //log in an existing user
-        userCredential = await signInWithEmailAndPassword(getAuth(), loginModel.email, loginModel.password)
+        userCredential = await signInWithEmailAndPassword(getAuthFirebase(), loginModel.email, loginModel.password)
     }
     catch (ex) {
         if (ex instanceof FirebaseError && (ex.code === "auth/user-not-found" || ex.code === "auth/wrong-password")) {

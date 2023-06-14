@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { getAnalytics } from "firebase/analytics";
 import { getApps, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 export function initializeFirebaseApp() {
     if (getApps().length > 0) {
@@ -54,4 +55,9 @@ export function getFirebaseAuth() {
         console.error("getFirebaseAuth", ex)
         throw Error("getFirebaseAuth")
     }
+}
+
+export function getAuthFirebase() {
+    initializeFirebaseApp()
+    return getAuth()
 }
