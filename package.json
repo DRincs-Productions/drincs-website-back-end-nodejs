@@ -1,11 +1,13 @@
 {
     "name": "drincs-website-back-end",
+    "author": "DRincs Productions",
+    "license": "GPL-3.0",
     "version": "1.0.0",
     "description": "",
     "main": "app.js",
     "scripts": {
-        "build": "rimraf dist && tsc",
-        "start": "nodemon src/index.ts",
+        "build": "tsc",
+        "start": "nodemon src/app.ts",
         "ts.check": "tsc --project tsconfig.json",
         "add-build": "git add dist",
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -17,8 +19,6 @@
         "add-build"
     ],
     "keywords": [],
-    "author": "",
-    "license": "ISC",
     "dependencies": {
         "@firebase/app-types": "^0.9.0",
         "@logtail/node": "^0.4.0",

@@ -1,0 +1,46 @@
+name: Render
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Archive Build
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [19.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install and CI and Build
+      run: |
+        npm install
+        npm ci
+        npm run build
+    - name: Archive Build
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: out
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # https://github.com/johnbeynon/render-deploy-action
+      - name: Deploy Project Artifacts to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }} # Can be found as part of the Deploy Hook
+          api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
