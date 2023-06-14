@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import { getAnalytics } from "firebase/analytics";
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { logError } from "./Logger";
 
 export function initializeFirebaseApp() {
     if (getApps().length > 0) {
@@ -41,8 +42,8 @@ export function getFirebaseAnalytics() {
         return getAnalytics()
     }
     catch (ex) {
-        console.error("getFirebaseAnalytics", ex)
-        throw Error("getFirebaseAnalytics")
+        logError("Firebase getFirebaseAnalytics", ex)
+        throw Error("Firebase getFirebaseAnalytics")
     }
 }
 
@@ -52,8 +53,8 @@ export function getFirebaseAuth() {
         return admin.auth()
     }
     catch (ex) {
-        console.error("getFirebaseAuth", ex)
-        throw Error("getFirebaseAuth")
+        logError("Firebase getFirebaseAuth", ex)
+        throw Error("Firebase getFirebaseAuth")
     }
 }
 
