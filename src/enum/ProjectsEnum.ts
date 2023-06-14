@@ -13,7 +13,7 @@ type ProjectsData = {
     crowdinLink: string,
 }
 
-export function getTranslationValuesByEnum(id: ProjectsEnum): ProjectsData {
+export function getTranslationValuesByEnum(id: number): ProjectsData {
     switch (id) {
         case ProjectsEnum.AFamilyVenture:
             return { crowdin: "492487", github: "DonRP/AFV", crowdinLink: "https://crowdin.com/project/a-family-venture" }

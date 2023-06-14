@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { ProjectsEnum, getTranslationValuesByEnum } from '../enum/ProjectsEnum';
+import { getTranslationValuesByEnum } from '../enum/ProjectsEnum';
 import { HttpResponse, generatedSuccesResult } from '../models/HttpResponse';
 import { TranslationResult } from '../models/translation/TranslationResult';
 import { getTranslations } from '../service/TranslationService';
@@ -10,10 +10,11 @@ export class TranslationController extends ControllerInterface {
     constructor(app: Express, route: string) {
         super(app, route)
 
-        app.get<string, any, HttpResponse<TranslationResult>, any, { projectId: ProjectsEnum }>(route + "/GetTranslations", (req, res) => {
+        app.get<string, any, HttpResponse<TranslationResult>, any, { projectId: string }>(route + "/GetTranslations", (req, res) => {
             logInfo("Start Translation GetTranslations")
             try {
-                let data = getTranslationValuesByEnum(req.query.projectId)
+                let projectId = parseInt(req.query.projectId)
+                let data = getTranslationValuesByEnum(projectId)
                 let repositoryName = data.github
                 let crowdinProjectId = data.crowdin
                 let crowdinLink = data.crowdinLink
