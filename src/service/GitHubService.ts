@@ -2,34 +2,14 @@ import { GitHubCreateIssueBody } from "../models/git/GitHubCreateIssueBody";
 import { GitHubRelease } from "../models/git/GitHubRelease";
 import { GitHubTranslationRelease } from "../models/git/GitHubTranslationRelease";
 import { GitRelease } from "../models/git/GitRelease";
-import { IsNullOrWhiteSpace, onlyLettersAndNumbers } from "../utility/UtilityFunctionts";
+import { IsNullOrWhiteSpace } from "../utility/UtilityFunctionts";
 import { getRequestWithHeaders, postRequest } from "./BaseRestService";
 
 const endpoint = "https://api.github.com"
-const permitted_users: string[] = ["DRincs-Productions", "DonRP"]
-
-function checkRepositoryName(repositoryName: string): boolean {
-    if (IsNullOrWhiteSpace(repositoryName)) {
-        throw Error("GitService GetReleases repositoryName Is Null Or Empty")
-    }
-
-    let array = repositoryName.split('/')
-    if (array.length != 2) {
-        throw Error("GitService GetReleases repositoryName not uguale to User/Repository: " + repositoryName)
-    }
-    if (!permitted_users.includes(array[0])) {
-        throw Error("GitService GetReleases repositoryName not permitted: " + repositoryName)
-    }
-    if (!onlyLettersAndNumbers(array[1])) {
-        throw Error("GitService GetReleases repositoryName Is SSRF:" + repositoryName)
-    }
-
-    return true
-}
 
 export async function getReleases(repositoryName: string): Promise<GitRelease[]> {
-    if (!checkRepositoryName(repositoryName)) {
-        throw Error("GitService getReleases repositoryName Error")
+    if (IsNullOrWhiteSpace(repositoryName)) {
+        throw Error("GitService getReleases projectId Is Null Or Empty")
     }
 
     let link: string = endpoint + "/repos/" + repositoryName + "/releases";
@@ -55,8 +35,8 @@ export async function getReleases(repositoryName: string): Promise<GitRelease[]>
 }
 
 export async function createIssue(repositoryName: string, issue: GitHubCreateIssueBody): Promise<any> {
-    if (!checkRepositoryName(repositoryName)) {
-        throw Error("GitService createIssue repositoryName Error")
+    if (IsNullOrWhiteSpace(repositoryName)) {
+        throw Error("GitService createIssue projectId Is Null Or Empty")
     }
 
     let link: string = endpoint + "/repos/" + repositoryName + "/issues";
@@ -77,7 +57,7 @@ export async function createIssue(repositoryName: string, issue: GitHubCreateIss
 export async function getTranslationRelease(repositoryName: string): Promise<GitHubTranslationRelease[]> {
     let releases = await getReleases(repositoryName);
     if (!releases) {
-        throw Error("getTranslationRelease GetReleasesAsync Error")
+        throw Error("GitService getTranslationRelease Error")
     }
 
     let result: GitHubTranslationRelease[] = releases.map((item) => {

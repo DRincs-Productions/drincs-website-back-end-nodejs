@@ -21,7 +21,7 @@ export function getWebApiUrl(): string {
         return "https://drincs-website-back-end.onrender.com"
     }
     else {
-        return "https://localhost:7289"
+        return "http://localhost:7289"
     }
 }
 
@@ -32,6 +32,10 @@ export function getClientUrl(): string {
     else {
         return "http://localhost:3005"
     }
+}
+
+export function getDiscordBotApi(): string {
+    return "https://drincs-discord-bot.onrender.com/"
 }
 
 export function getDefaultUserIcon(): string {
@@ -45,8 +49,4 @@ export function getOAuthDiscordCallback(): string {
     else {
         return "https://discord.com/api/oauth2/authorize?client_id=955048685056692307&redirect_uri=https%3A%2F%2Flocalhost%3A7127%2Fauth%2FOAuthDiscordCallback&response_type=code&scope=identify%20email"
     }
-}
-
-export function onlyLettersAndNumbers(str: string) {
-    return /^[A-Za-z0-9]*$/.test(str);
 }
