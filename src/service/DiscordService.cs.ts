@@ -47,6 +47,6 @@ export async function getUserInfoDiscord(token: string): Promise<DiscordUserInfo
     return data
 }
 
-export function awakensDiscord() {
-    getRequest<DiscordTokenRespons>(getDiscordBotApi())
+export async function awakensDiscord() {
+    await getRequest<DiscordTokenRespons>(getDiscordBotApi())
 }
