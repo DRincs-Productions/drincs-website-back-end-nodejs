@@ -44,6 +44,7 @@ export function logTest(): string {
         return true.toString()
     }
     catch (ex) {
+        console.error(ex)
         return false.toString()
     }
 }
