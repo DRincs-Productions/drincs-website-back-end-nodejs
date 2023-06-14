@@ -6,6 +6,7 @@ export class TranslationResult {
     name?: string;
     logo?: string;
     description?: string;
+    crowdinLink?: string;
 }
 
 export class TranslationResultItem {
