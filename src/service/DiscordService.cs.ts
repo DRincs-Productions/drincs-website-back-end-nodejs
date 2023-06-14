@@ -1,8 +1,8 @@
 import { MyError } from "../models/MyError";
 import { DiscordTokenRespons } from "../models/auth/DiscordTokenRespons";
 import { DiscordUserInfo } from "../models/auth/DiscordUserInfo";
-import { IsNullOrWhiteSpace, getWebApiUrl, } from "../utility/UtilityFunctionts";
-import { getRequestWithHeaders, postRequest } from "./BaseRestService";
+import { IsNullOrWhiteSpace, getDiscordBotApi, getWebApiUrl, } from "../utility/UtilityFunctionts";
+import { getRequest, getRequestWithHeaders, postRequest } from "./BaseRestService";
 
 export async function geTokenDiscord(code: string): Promise<string> {
     // https://miniorange.com/atlassian/rest-api-authentication-using-discord-as-oauth-provider/
@@ -45,4 +45,8 @@ export async function getUserInfoDiscord(token: string): Promise<DiscordUserInfo
     }
 
     return data
+}
+
+export function awakensDiscord() {
+    getRequest<DiscordTokenRespons>(getDiscordBotApi())
 }

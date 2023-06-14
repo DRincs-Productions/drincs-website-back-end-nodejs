@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import express, { Express } from 'express';
 import rateLimit from 'express-rate-limit';
 import { AuthController } from "./controllers/AuthController";
+import { DiscordController } from "./controllers/DiscordController";
 import { GitHubController } from "./controllers/GitHubController";
 import { TranslationController } from "./controllers/TranslationController";
 import { initializeFirebaseAdiminApp, initializeFirebaseApp } from "./utility/Firebase";
@@ -43,6 +44,7 @@ catch (ex) {
 new TranslationController(app, "/api/translation")
 new GitHubController(app, "/api/github")
 new AuthController(app, "/api/auth")
+new DiscordController(app, "/api/discord")
 
 app.get("/api", (req, res) => {
     logInfo("Home")
