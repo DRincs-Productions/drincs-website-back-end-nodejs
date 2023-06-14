@@ -35,7 +35,7 @@ export function getClientUrl(): string {
 }
 
 export function getDiscordBotApi(): string {
-    return "https://drincs-discord-bot.onrender.com/"
+    return "https://drincs-discord-bot.onrender.com"
 }
 
 export function getDefaultUserIcon(): string {
