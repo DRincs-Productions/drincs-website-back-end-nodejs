@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { AuthController } from "./controllers/AuthController";
 import { GitHubController } from "./controllers/GitHubController";
 import { TranslationController } from "./controllers/TranslationController";
-import { initializeFirebaseApp } from "./utility/Firebase";
+import { initializeFirebaseAdiminApp, initializeFirebaseApp } from "./utility/Firebase";
 import { logError, logInfo, logTest } from "./utility/Logger";
 
 // env
@@ -33,6 +33,7 @@ app.use(limiter)
 
 try {
     initializeFirebaseApp()
+    initializeFirebaseAdiminApp()
 }
 catch (ex) {
     logError("initializeFirebaseApp", ex)

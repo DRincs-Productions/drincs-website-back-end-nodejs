@@ -1,8 +1,12 @@
 import * as admin from "firebase-admin";
 import { getAnalytics } from "firebase/analytics";
-import { initializeApp } from "firebase/app";
+import { getApps, initializeApp } from "firebase/app";
 
 export function initializeFirebaseApp() {
+    if (getApps().length > 0) {
+        return
+    }
+
     initializeApp({
         apiKey: process.env.FIREBASE_WEBSITE_WEBAPI_APIKEY,
         authDomain: process.env.FIREBASE_WEBSITE_WEBAPI_AUTHDOMAIN,
@@ -12,6 +16,13 @@ export function initializeFirebaseApp() {
         appId: process.env.FIREBASE_WEBSITE_WEBAPI_APPID,
         measurementId: process.env.FIREBASE_WEBSITE_WEBAPI_MEASUREMENTID,
     })
+}
+
+export function initializeFirebaseAdiminApp() {
+    if (admin.apps.length > 0) {
+        return
+    }
+
     // https://cloud.google.com/docs/authentication/application-default-credentials?hl=it#GAC
     admin.initializeApp({
         credential: admin.credential.cert({
@@ -23,6 +34,7 @@ export function initializeFirebaseApp() {
 }
 
 export function getFirebaseAnalytics() {
+    initializeFirebaseApp()
     // https://stackoverflow.com/questions/59400315/is-it-possible-to-setup-firebase-analytics-from-an-express-server
     try {
         return getAnalytics()
@@ -34,6 +46,7 @@ export function getFirebaseAnalytics() {
 }
 
 export function getFirebaseAuth() {
+    initializeFirebaseAdiminApp()
     try {
         return admin.auth()
     }
