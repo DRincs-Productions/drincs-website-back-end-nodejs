@@ -4,9 +4,10 @@ import rateLimit from 'express-rate-limit';
 import { AuthController } from "./controllers/AuthController";
 import { DiscordController } from "./controllers/DiscordController";
 import { GitHubController } from "./controllers/GitHubController";
+import { TesterController } from "./controllers/TesterController";
 import { TranslationController } from "./controllers/TranslationController";
 import { initializeFirebaseAdiminApp, initializeFirebaseApp } from "./utility/Firebase";
-import { logError, logInfo, logTest } from "./utility/Logger";
+import { logError, logInfo } from "./utility/Logger";
 
 // env
 let dotenv = require('dotenv');
@@ -45,14 +46,11 @@ new TranslationController(app, "/api/translation")
 new GitHubController(app, "/api/github")
 new AuthController(app, "/api/auth")
 new DiscordController(app, "/api/discord")
+new TesterController(app, "/api/test")
 
 app.get("/api", (req, res) => {
     logInfo("Home")
     res.send(`This is the drincs-website-back-end`)
-})
-
-app.get("/api/test/logger", (req, res) => {
-    res.send(logTest())
 })
 
 app.listen(port, () => logInfo(`Server is running on port ${port}!`));
