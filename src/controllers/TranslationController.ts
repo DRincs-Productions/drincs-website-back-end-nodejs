@@ -13,9 +13,12 @@ export class TranslationController extends ControllerInterface {
         app.get<string, any, HttpResponse<TranslationResult>, any, { projectId: ProjectsEnum }>(route + "/GetTranslations", (req, res) => {
             logInfo("Start Translation GetTranslations")
             try {
-                let repositoryName = getTranslationValuesByEnum(req.query.projectId).github
-                let crowdinProjectId = getTranslationValuesByEnum(req.query.projectId).crowdin
+                let data = getTranslationValuesByEnum(req.query.projectId)
+                let repositoryName = data.github
+                let crowdinProjectId = data.crowdin
+                let crowdinLink = data.crowdinLink
                 getTranslations(repositoryName, crowdinProjectId).then((value) => {
+                    value.crowdinLink = crowdinLink
                     res.send(generatedSuccesResult<TranslationResult>(value))
                 }).catch((e) => {
                     this.sendError(res, e)
