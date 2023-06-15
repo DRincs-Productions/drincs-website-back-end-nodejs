@@ -17,11 +17,11 @@ abstract class ControllerInterface {
         let messages: string = ""
         let messagesToShow: string | undefined = undefined
         if (e instanceof MyError) {
-            messages = e.message.toLocaleLowerCase()
-            messagesToShow = e.messageToShow.toLocaleLowerCase()
+            messages = e.message
+            messagesToShow = e.messageToShow
         }
         else if (e instanceof Error) {
-            messages = e.message.toLocaleLowerCase()
+            messages = e.message
         }
         let value = new HttpResponse<T>(statusCode, messages, messagesToShow)
         res.status(statusCode).send(value)
