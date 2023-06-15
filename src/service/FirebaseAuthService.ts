@@ -110,7 +110,7 @@ export async function signInWithEmailPassword(loginModel: LoginAccount, audience
     if (!loginModel.email || IsNullOrWhiteSpace(loginModel.email)) {
         throw Error("FirebaseAuthService.signInWithEmailPassword: email is null")
     }
-    if (!loginModel.password || IsNullOrWhiteSpace(signInWithEmailPassword.password)) {
+    if (!loginModel.password || IsNullOrWhiteSpace(loginModel.password)) {
         throw Error("FirebaseAuthService.signInWithEmailPassword: password is null")
     }
     let userCredential
