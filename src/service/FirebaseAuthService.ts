@@ -99,7 +99,7 @@ export async function resetPassword(email: string): Promise<boolean> {
     }
 
     if (!link || IsNullOrWhiteSpace(link)) {
-        throw Error("FirebaseAuth ResetPassword Is Not Successful " + email)
+        throw Error("FirebaseAuthService ResetPassword Is Not Successful " + email)
     }
 
     await sendResetPasswordMail(email, link)
@@ -108,10 +108,10 @@ export async function resetPassword(email: string): Promise<boolean> {
 
 export async function signInWithEmailPassword(loginModel: LoginAccount, audienceHost?: string): Promise<AuthData> {
     if (!loginModel.email || IsNullOrWhiteSpace(loginModel.email)) {
-        throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync email is null")
+        throw Error("FirebaseAuthService.signInWithEmailPassword: email is null")
     }
-    if (!loginModel.password || IsNullOrWhiteSpace(loginModel.password)) {
-        throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync password is null")
+    if (!loginModel.password || IsNullOrWhiteSpace(signInWithEmailPassword.password)) {
+        throw Error("FirebaseAuthService.signInWithEmailPassword: password is null")
     }
     let userCredential
     try {
@@ -120,17 +120,17 @@ export async function signInWithEmailPassword(loginModel: LoginAccount, audience
     }
     catch (ex) {
         if (ex instanceof FirebaseError && (ex.code === "auth/user-not-found" || ex.code === "auth/wrong-password")) {
-            throw new MyError("Non-registered user or Wrong credentials", "FirebaseAuth SignInWithEmailAndPasswordAsync")
+            throw new MyError("Non-registered user or Wrong credentials", "FirebaseAuthService.signInWithEmailPassword")
         }
-        logError("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync: {0}", ex);
-        throw Error("Exception caught in FirebaseAuth SignInWithEmailAndPasswordAsync")
+        logError("FirebaseAuthService.signInWithEmailPassword: Exception caught: {0}", ex);
+        throw Error("FirebaseAuthService.signInWithEmailPassword: Exception caught")
     }
     if (!userCredential) {
-        throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Email or Password not Correct")
+        throw Error("FirebaseAuthService.signInWithEmailPassword: Email or Password not Correct")
     }
     let authData = await GetTokenByEmail(loginModel.email, audienceHost);
     if (!authData) {
-        throw Error("FirebaseAuth SignInWithEmailAndPasswordAsync Is Not Successful")
+        throw Error("FirebaseAuthService.signInWithEmailPassword: Is Not Successful")
     }
     return authData
 }
@@ -144,7 +144,7 @@ function GetSupportRole(userCredential: UserRecord): TypeAccount {
 async function GetTokenByEmail(email?: string, audienceHost?: string): Promise<AuthData | undefined> {
     let userRecord: UserRecord
     if (!email || IsNullOrWhiteSpace(email)) {
-        throw Error("FirebaseAuth GetToken Error email IsNullOrWhiteSpace")
+        throw Error("FirebaseAuthService GetToken Error email IsNullOrWhiteSpace")
     }
     try {
         userRecord = await getFirebaseAuth().getUserByEmail(email)
@@ -192,7 +192,7 @@ export async function oAuthDiscordCallback(code: string, audienceHost?: string):
 
     // * User must be verified
     if (!userInfo.verified) {
-        logError("FirebaseAuth OAuthDiscordCallback: Discord account must be verified");
+        logError("FirebaseAuthService OAuthDiscordCallback: Discord account must be verified");
         throw new MyError("Discord account must be verified", "FirebaseAuth OAuthDiscordCallback")
     }
 
@@ -206,7 +206,7 @@ export async function oAuthDiscordCallback(code: string, audienceHost?: string):
         firebaseAuthData = await GetTokenByEmail(userInfo.email, audienceHost);
 
         if (!firebaseAuthData) {
-            logError("FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error");
+            logError("FirebaseAuthService OAuthDiscordCallback: authService.CreateAccount Error");
             throw new MyError("There was an error when creating the account", "FirebaseAuth OAuthDiscordCallback: authService.CreateAccount Error")
         }
     }
